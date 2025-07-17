@@ -1,48 +1,51 @@
-import React from 'react';
+/** @format */
 
-import type { VariantProps } from '@gluestack-ui/nativewind-utils';
-import { Text as RNText } from 'react-native';
-import { textStyle } from './styles';
+import React from "react";
 
-type ITextProps = React.ComponentProps<typeof RNText> &
-  VariantProps<typeof textStyle>;
+import type { VariantProps } from "@gluestack-ui/nativewind-utils";
+import { Text as RNText, type TextProps as RNTextProps } from "react-native";
+import { textStyle } from "./styles";
+import { PropSlot, type AsChildProps } from "../slot";
 
-const Text = React.forwardRef<React.ComponentRef<typeof RNText>, ITextProps>(
-  function Text(
-    {
-      className,
-      isTruncated,
-      bold,
-      underline,
-      strikeThrough,
-      size = 'md',
-      sub,
-      italic,
-      highlight,
-      ...props
-    },
-    ref
-  ) {
-    return (
-      <RNText
-        className={textStyle({
-          isTruncated,
-          bold,
-          underline,
-          strikeThrough,
-          size,
-          sub,
-          italic,
-          highlight,
-          class: className,
-        })}
-        {...props}
-        ref={ref}
-      />
-    );
-  }
-);
+type BaseTextProps = Prettify<
+	RNTextProps & VariantProps<typeof textStyle> & { ref?: React.Ref<RNText> }
+>;
 
-Text.displayName = 'Text';
+const TextSlot = PropSlot as React.FC<BaseTextProps>;
 
-export { Text };
+type TextProps = AsChildProps<BaseTextProps>;
+
+const Text: React.FC<TextProps> = ({
+	className,
+	isTruncated,
+	bold,
+	underline,
+	strikeThrough,
+	size = "md",
+	sub,
+	italic,
+	highlight,
+	asChild,
+	...props
+}) => {
+	const Comp = asChild ? TextSlot : RNText;
+	return (
+		<Comp
+			{...props}
+			className={textStyle({
+				isTruncated,
+				bold,
+				underline,
+				strikeThrough,
+				size,
+				sub,
+				italic,
+				highlight,
+				class: className,
+			})}
+		/>
+	);
+};
+
+export { Text, TextSlot };
+export type { TextProps };
