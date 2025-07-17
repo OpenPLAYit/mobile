@@ -7,7 +7,7 @@ import React from "react";
 export default function Home() {
 	return (
 		<Box className="flex-1 bg-black h-[100vh]">
-			<Text>Home screen</Text>
+			<Text className="text-black">Home screen</Text>
 		</Box>
 	);
 }

@@ -1,37 +1,48 @@
 {
-  "expo": {
-    "name": "OpenPLAYit",
-    "slug": "openplayit",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "src/assets/images/icon.png",
-    "scheme": "openplayit",
-    "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
-    "android": {
-      "package": "com.onyedikachi23.openplayit"
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "src/assets/images/logo.png"
-    },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "src/assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#080101"
-        }
-      ],
-      "expo-font",
-      "expo-web-browser"
-    ],
-    "experiments": {
-      "typedRoutes": true
-    }
-  }
+	"expo": {
+		"name": "OpenPLAYit",
+		"slug": "openplayit",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "src/assets/images/icon.png",
+		"scheme": "openplayit",
+		"userInterfaceStyle": "dark",
+		"newArchEnabled": true,
+		"android": {
+			"package": "com.openplayit.app",
+			"edgeToEdgeEnabled": true
+		},
+		"web": {
+			"bundler": "metro",
+			"output": "static",
+			"favicon": "src/assets/images/logo.png"
+		},
+		"plugins": [
+			"expo-router",
+			[
+				"expo-splash-screen",
+				{
+					"image": "src/assets/images/splash-icon.png",
+					"imageWidth": 200,
+					"resizeMode": "contain",
+					"backgroundColor": "#080101"
+				}
+			],
+			"expo-font",
+			"expo-web-browser"
+		],
+		"experiments": {
+			"typedRoutes": true
+		},
+		"extra": {
+			"router": {},
+			"eas": {
+				"projectId": "6761147d-e90e-4066-8f4e-f6c0d4d0e60d"
+			}
+		},
+		"owner": "onyedikachi23",
+		"ios": {
+			"bundleIdentifier": "com.openplayit.app"
+		}
+	}
 }
