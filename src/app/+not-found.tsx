@@ -1,9 +1,8 @@
 /** @format */
 
+import { Box } from "@/components/ui/box";
+import { Text } from "@/components/ui/text";
 import { Link, Stack } from "expo-router";
-
-import { Box } from "@/src/components/ui/box";
-import { Text } from "@/src/components/ui/text";
 
 export default function NotFoundScreen() {
 	return (
