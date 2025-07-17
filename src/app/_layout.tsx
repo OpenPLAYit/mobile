@@ -1,5 +1,6 @@
 /** @format */
 
+import { GluestackUIProvider } from "@/src/components/ui/gluestack-ui-provider";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
 	DarkTheme,
@@ -7,11 +8,10 @@ import {
 	ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
+import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
-import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useColorScheme } from "react-native";
-import { Slot } from "expo-router";
 
 import "../global.css";
 
