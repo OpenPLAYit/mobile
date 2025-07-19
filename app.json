@@ -4,7 +4,7 @@
 		"slug": "openplayit",
 		"version": "1.0.0",
 		"orientation": "portrait",
-		"icon": "src/assets/images/icon.png",
+		"icon": "src/assets/images/brand/icon.png",
 		"scheme": "openplayit",
 		"userInterfaceStyle": "dark",
 		"newArchEnabled": true,
@@ -15,14 +15,14 @@
 		"web": {
 			"bundler": "metro",
 			"output": "static",
-			"favicon": "src/assets/images/logo.png"
+			"favicon": "src/assets/images/brand/logo.png"
 		},
 		"plugins": [
 			"expo-router",
 			[
 				"expo-splash-screen",
 				{
-					"image": "src/assets/images/splash-icon.png",
+					"image": "src/assets/images/brand/splash-icon.png",
 					"imageWidth": 200,
 					"resizeMode": "contain",
 					"backgroundColor": "#080101"
@@ -40,9 +40,6 @@
 				"projectId": "6761147d-e90e-4066-8f4e-f6c0d4d0e60d"
 			}
 		},
-		"owner": "onyedikachi23",
-		"ios": {
-			"bundleIdentifier": "com.openplayit.app"
-		}
+		"owner": "onyedikachi23"
 	}
 }
