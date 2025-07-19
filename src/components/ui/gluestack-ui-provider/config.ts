@@ -7,313 +7,317 @@ type ColorKey = `--color-${string}-${string}`;
 type ColorValue = `${number} ${number} ${number}`;
 type ColorMap = Record<ColorKey, ColorValue>;
 
+// Derived shade 0 for colors: Average of 50 and 100, then slightly desaturated and lightened/darkened towards white/black respectively.
+// For example, for green-0, the values for green-50 (240 253 244) and green-100 (220 252 231) are averaged
+// (230 252.5 237.5) and then adjusted. For dark theme, it's adjusted towards black.
+
 const lightThemeMap = {
-	"--color-primary-0": "179 179 179",
-	"--color-primary-50": "153 153 153",
-	"--color-primary-100": "128 128 128",
-	"--color-primary-200": "115 115 115",
-	"--color-primary-300": "102 102 102",
-	"--color-primary-400": "82 82 82",
-	"--color-primary-500": "51 51 51",
-	"--color-primary-600": "41 41 41",
-	"--color-primary-700": "31 31 31",
-	"--color-primary-800": "13 13 13",
-	"--color-primary-900": "10 10 10",
-	"--color-primary-950": "8 8 8",
+	"--color-primary-0": "252 252 251", // Derived from Stone-50 (250 250 249) #FCFCFB
+	"--color-primary-50": "250 250 249", // Stone-50 #FAFAFA
+	"--color-primary-100": "245 245 244", // Stone-100 #F5F5F4
+	"--color-primary-200": "231 229 228", // Stone-200 #E7E5E4
+	"--color-primary-300": "214 211 209", // Stone-300 #D6D3D1
+	"--color-primary-400": "168 162 158", // Stone-400 #A8A29E
+	"--color-primary-500": "120 113 108", // Stone-500 #78716C
+	"--color-primary-600": "87 83 78", // Stone-600 #57534A
+	"--color-primary-700": "68 64 60", // Stone-700 #44403C
+	"--color-primary-800": "41 37 36", // Stone-800 #292524
+	"--color-primary-900": "28 25 23", // Stone-900 #1C1917
+	"--color-primary-950": "12 10 9", // Stone-950 #0C0A09
 
-	/* Secondary  */
-	"--color-secondary-0": "253 253 253",
-	"--color-secondary-50": "251 251 251",
-	"--color-secondary-100": "246 246 246",
-	"--color-secondary-200": "242 242 242",
-	"--color-secondary-300": "237 237 237",
-	"--color-secondary-400": "230 230 231",
-	"--color-secondary-500": "217 217 219",
-	"--color-secondary-600": "198 199 199",
-	"--color-secondary-700": "189 189 189",
-	"--color-secondary-800": "177 177 177",
-	"--color-secondary-900": "165 164 164",
-	"--color-secondary-950": "157 157 157",
+	/* Secondary (Stone) */
+	"--color-secondary-0": "252 252 251", // Derived from Stone-50 (250 250 249) #FCFCFB
+	"--color-secondary-50": "250 250 249", // Stone-50 #FAFAFA
+	"--color-secondary-100": "245 245 244", // Stone-100 #F5F5F4
+	"--color-secondary-200": "231 229 228", // Stone-200 #E7E5E4
+	"--color-secondary-300": "214 211 209", // Stone-300 #D6D3D1
+	"--color-secondary-400": "168 162 158", // Stone-400 #A8A29E
+	"--color-secondary-500": "120 113 108", // Stone-500 #78716C
+	"--color-secondary-600": "87 83 78", // Stone-600 #57534A
+	"--color-secondary-700": "68 64 60", // Stone-700 #44403C
+	"--color-secondary-800": "41 37 36", // Stone-800 #292524
+	"--color-secondary-900": "28 25 23", // Stone-900 #1C1917
+	"--color-secondary-950": "12 10 9", // Stone-950 #0C0A09
 
-	/* Tertiary */
-	"--color-tertiary-0": "255 250 245",
-	"--color-tertiary-50": "255 242 229",
-	"--color-tertiary-100": "255 233 213",
-	"--color-tertiary-200": "254 209 170",
-	"--color-tertiary-300": "253 180 116",
-	"--color-tertiary-400": "251 157 75",
-	"--color-tertiary-500": "231 129 40",
-	"--color-tertiary-600": "215 117 31",
-	"--color-tertiary-700": "180 98 26",
-	"--color-tertiary-800": "130 73 23",
-	"--color-tertiary-900": "108 61 19",
-	"--color-tertiary-950": "84 49 18",
+	/* Tertiary (Amber) */
+	"--color-tertiary-0": "255 255 250", // Derived from Amber-50 (255 247 237) #FFFFFA
+	"--color-tertiary-50": "255 247 237", // Amber-50 #FFF7ED
+	"--color-tertiary-100": "255 237 213", // Amber-100 #FFEDD5
+	"--color-tertiary-200": "254 215 170", // Amber-200 #FED7AA
+	"--color-tertiary-300": "253 186 116", // Amber-300 #FDBA74
+	"--color-tertiary-400": "251 146 60", // Amber-400 #FB923C
+	"--color-tertiary-500": "249 115 22", // Amber-500 #F97316
+	"--color-tertiary-600": "234 88 12", // Amber-600 #EA580C
+	"--color-tertiary-700": "194 65 12", // Amber-700 #C2410C
+	"--color-tertiary-800": "154 52 18", // Amber-800 #9A3412
+	"--color-tertiary-900": "124 45 18", // Amber-900 #7C2D12
+	"--color-tertiary-950": "67 21 8", // Amber-950 #431508
 
-	/* Error */
-	"--color-error-0": "254 233 233",
-	"--color-error-50": "254 226 226",
-	"--color-error-100": "254 202 202",
-	"--color-error-200": "252 165 165",
-	"--color-error-300": "248 113 113",
-	"--color-error-400": "239 68 68",
-	"--color-error-500": "230 53 53",
-	"--color-error-600": "220 38 38",
-	"--color-error-700": "185 28 28",
-	"--color-error-800": "153 27 27",
-	"--color-error-900": "127 29 29",
-	"--color-error-950": "83 19 19",
+	/* Error (Red) */
+	"--color-error-0": "254 250 250", // Derived from Red-50 (254 242 242) #FEFAFA
+	"--color-error-50": "254 242 242", // Red-50 #FEF2F2
+	"--color-error-100": "254 226 226", // Red-100 #FEE2E2
+	"--color-error-200": "254 202 202", // Red-200 #FECACA
+	"--color-error-300": "252 165 165", // Red-300 #FCA5A5
+	"--color-error-400": "248 113 113", // Red-400 #F87171
+	"--color-error-500": "239 68 68", // Red-500 #EF4444
+	"--color-error-600": "220 38 38", // Red-600 #DC2626
+	"--color-error-700": "185 28 28", // Red-700 #B91C1C
+	"--color-error-800": "153 27 27", // Red-800 #991B1B
+	"--color-error-900": "127 29 29", // Red-900 #7F1D1D
+	"--color-error-950": "69 10 10", // Red-950 #450A0A
 
-	/* Success */
-	"--color-success-0": "228 255 244",
-	"--color-success-50": "202 255 232",
-	"--color-success-100": "162 241 192",
-	"--color-success-200": "132 211 162",
-	"--color-success-300": "102 181 132",
-	"--color-success-400": "72 151 102",
-	"--color-success-500": "52 131 82",
-	"--color-success-600": "42 121 72",
-	"--color-success-700": "32 111 62",
-	"--color-success-800": "22 101 52",
-	"--color-success-900": "20 83 45",
-	"--color-success-950": "27 50 36",
+	/* Success (Green) */
+	"--color-success-0": "245 255 249", // Derived from Green-50 (240 253 244) #F5FFF9
+	"--color-success-50": "240 253 244", // Green-50 #F0FDD4
+	"--color-success-100": "220 252 231", // Green-100 #DCFCE7
+	"--color-success-200": "185 248 207", // Green-200 #B9F8CF
+	"--color-success-300": "123 241 168", // Green-300 #7BF1A8
+	"--color-success-400": "5 223 114", // Green-400 #05DF72
+	"--color-success-500": "0 201 80", // Green-500 #00C950
+	"--color-success-600": "0 166 62", // Green-600 #00A63E
+	"--color-success-700": "0 130 54", // Green-700 #008236
+	"--color-success-800": "1 102 48", // Green-800 #016630
+	"--color-success-900": "13 84 43", // Green-900 #0D542B
+	"--color-success-950": "3 46 21", // Green-950 #032E15
 
-	/* Warning */
-	"--color-warning-0": "255 249 245",
-	"--color-warning-50": "255 244 236",
-	"--color-warning-100": "255 231 213",
-	"--color-warning-200": "254 205 170",
-	"--color-warning-300": "253 173 116",
-	"--color-warning-400": "251 149 75",
-	"--color-warning-500": "231 120 40",
-	"--color-warning-600": "215 108 31",
-	"--color-warning-700": "180 90 26",
-	"--color-warning-800": "130 68 23",
-	"--color-warning-900": "108 56 19",
-	"--color-warning-950": "84 45 18",
+	/* Warning (Yellow) */
+	"--color-warning-0": "255 255 250", // Derived from Yellow-50 (254 252 232) #FFFFFA
+	"--color-warning-50": "254 252 232", // Yellow-50 #FEFCE8
+	"--color-warning-100": "254 249 195", // Yellow-100 #FEF9C3
+	"--color-warning-200": "254 240 138", // Yellow-200 #FEEB8A
+	"--color-warning-300": "253 224 71", // Yellow-300 #FDE047
+	"--color-warning-400": "250 204 21", // Yellow-400 #FAC015
+	"--color-warning-500": "234 179 8", // Yellow-500 #EAB308
+	"--color-warning-600": "202 138 4", // Yellow-600 #CA8A04
+	"--color-warning-700": "161 98 7", // Yellow-700 #A16207
+	"--color-warning-800": "133 77 14", // Yellow-800 #854D0E
+	"--color-warning-900": "113 63 18", // Yellow-900 #713F12
+	"--color-warning-950": "66 32 6", // Yellow-950 #422006
 
-	/* Info */
-	"--color-info-0": "236 248 254",
-	"--color-info-50": "199 235 252",
-	"--color-info-100": "162 221 250",
-	"--color-info-200": "124 207 248",
-	"--color-info-300": "87 194 246",
-	"--color-info-400": "50 180 244",
-	"--color-info-500": "13 166 242",
-	"--color-info-600": "11 141 205",
-	"--color-info-700": "9 115 168",
-	"--color-info-800": "7 90 131",
-	"--color-info-900": "5 64 93",
-	"--color-info-950": "3 38 56",
+	/* Info (Sky) */
+	"--color-info-0": "240 252 255", // Derived from Sky-50 (240 249 255) #F0FCFF
+	"--color-info-50": "240 249 255", // Sky-50 #F0F9FF
+	"--color-info-100": "224 242 254", // Sky-100 #E0F2FE
+	"--color-info-200": "186 230 253", // Sky-200 #BAE6FD
+	"--color-info-300": "125 211 252", // Sky-300 #7DD3FC
+	"--color-info-400": "56 189 248", // Sky-400 #38BDF8
+	"--color-info-500": "14 165 233", // Sky-500 #0EA5E9
+	"--color-info-600": "2 132 199", // Sky-600 #0284C7
+	"--color-info-700": "3 105 161", // Sky-700 #0369A1
+	"--color-info-800": "7 89 133", // Sky-800 #075985
+	"--color-info-900": "12 74 110", // Sky-900 #0C4A6E
+	"--color-info-950": "8 47 73", // Sky-950 #082F49
 
-	/* Typography */
-	"--color-typography-0": "254 254 255",
-	"--color-typography-50": "245 245 245",
-	"--color-typography-100": "229 229 229",
-	"--color-typography-200": "219 219 220",
-	"--color-typography-300": "212 212 212",
-	"--color-typography-400": "163 163 163",
-	"--color-typography-500": "140 140 140",
-	"--color-typography-600": "115 115 115",
-	"--color-typography-700": "82 82 82",
-	"--color-typography-800": "64 64 64",
-	"--color-typography-900": "38 38 39",
-	"--color-typography-950": "23 23 23",
+	/* Typography (Stone) */
+	"--color-typography-0": "252 252 251", // Derived from Stone-50 (250 250 249) #FCFCFB
+	"--color-typography-50": "250 250 249", // Stone-50 #FAFAFA
+	"--color-typography-100": "245 245 244", // Stone-100 #F5F5F4
+	"--color-typography-200": "231 229 228", // Stone-200 #E7E5E4
+	"--color-typography-300": "214 211 209", // Stone-300 #D6D3D1
+	"--color-typography-400": "168 162 158", // Stone-400 #A8A29E
+	"--color-typography-500": "120 113 108", // Stone-500 #78716C
+	"--color-typography-600": "87 83 78", // Stone-600 #57534A
+	"--color-typography-700": "68 64 60", // Stone-700 #44403C
+	"--color-typography-800": "41 37 36", // Stone-800 #292524
+	"--color-typography-900": "28 25 23", // Stone-900 #1C1917
+	"--color-typography-950": "12 10 9", // Stone-950 #0C0A09
 
-	/* Outline */
-	"--color-outline-0": "253 254 254",
-	"--color-outline-50": "243 243 243",
-	"--color-outline-100": "230 230 230",
-	"--color-outline-200": "221 220 219",
-	"--color-outline-300": "211 211 211",
-	"--color-outline-400": "165 163 163",
-	"--color-outline-500": "140 141 141",
-	"--color-outline-600": "115 116 116",
-	"--color-outline-700": "83 82 82",
-	"--color-outline-800": "65 65 65",
-	"--color-outline-900": "39 38 36",
-	"--color-outline-950": "26 23 23",
+	/* Outline (Stone) */
+	"--color-outline-0": "252 252 251", // Derived from Stone-50 (250 250 249) #FCFCFB
+	"--color-outline-50": "250 250 249", // Stone-50 #FAFAFA
+	"--color-outline-100": "245 245 244", // Stone-100 #F5F5F4
+	"--color-outline-200": "231 229 228", // Stone-200 #E7E5E4
+	"--color-outline-300": "214 211 209", // Stone-300 #D6D3D1
+	"--color-outline-400": "168 162 158", // Stone-400 #A8A29E
+	"--color-outline-500": "120 113 108", // Stone-500 #78716C
+	"--color-outline-600": "87 83 78", // Stone-600 #57534A
+	"--color-outline-700": "68 64 60", // Stone-700 #44403C
+	"--color-outline-800": "41 37 36", // Stone-800 #292524
+	"--color-outline-900": "28 25 23", // Stone-900 #1C1917
+	"--color-outline-950": "12 10 9", // Stone-950 #0C0A09
 
-	/* Background */
-	"--color-background-0": "255 255 255",
-	"--color-background-50": "246 246 246",
-	"--color-background-100": "242 241 241",
-	"--color-background-200": "220 219 219",
-	"--color-background-300": "213 212 212",
-	"--color-background-400": "162 163 163",
-	"--color-background-500": "142 142 142",
-	"--color-background-600": "116 116 116",
-	"--color-background-700": "83 82 82",
-	"--color-background-800": "65 64 64",
-	"--color-background-900": "39 38 37",
-	"--color-background-950": "18 18 18",
+	/* Background (Stone) */
+	"--color-background-0": "252 252 251", // Derived from Stone-50 (250 250 249) #FCFCFB
+	"--color-background-50": "250 250 249", // Stone-50 #FAFAFA
+	"--color-background-100": "245 245 244", // Stone-100 #F5F5F4
+	"--color-background-200": "231 229 228", // Stone-200 #E7E5E4
+	"--color-background-300": "214 211 209", // Stone-300 #D6D3D1
+	"--color-background-400": "168 162 158", // Stone-400 #A8A29E
+	"--color-background-500": "120 113 108", // Stone-500 #78716C
+	"--color-background-600": "87 83 78", // Stone-600 #57534A
+	"--color-background-700": "68 64 60", // Stone-700 #44403C
+	"--color-background-800": "41 37 36", // Stone-800 #292524
+	"--color-background-900": "28 25 23", // Stone-900 #1C1917
+	"--color-background-950": "12 10 9", // Stone-950 #0C0A09
 
 	/* Background Special */
-	"--color-background-error": "254 241 241",
-	"--color-background-warning": "255 243 234",
-	"--color-background-success": "237 252 242",
-	"--color-background-muted": "247 248 247",
-	"--color-background-info": "235 248 254",
+	"--color-background-error": "254 242 242", // Red-50 #FEF2F2
+	"--color-background-warning": "254 252 232", // Yellow-50 #FEFCE8
+	"--color-background-success": "240 253 244", // Green-50 #F0FDD4
+	"--color-background-muted": "250 250 249", // Stone-50 #FAFAFA
+	"--color-background-info": "240 249 255", // Sky-50 #F0F9FF
 
-	/* Focus Ring Indicator  */
-	"--color-indicator-primary": "55 55 55",
-	"--color-indicator-info": "83 153 236",
-	"--color-indicator-error": "185 28 28",
+	/* Focus Ring Indicator */
+	"--color-indicator-primary": "120 113 108", // Stone-500 #78716C
+	"--color-indicator-info": "14 165 233", // Sky-500 #0EA5E9
+	"--color-indicator-error": "185 28 28", // Red-700 #B91C1C
 } satisfies ColorMap;
 
 type ThemeColorKey = keyof typeof lightThemeMap;
 type ThemeColorMap = Record<ThemeColorKey, ColorValue>;
 
 const darkThemeMap = {
-	"--color-primary-0": "166 166 166",
-	"--color-primary-50": "175 175 175",
-	"--color-primary-100": "186 186 186",
-	"--color-primary-200": "197 197 197",
-	"--color-primary-300": "212 212 212",
-	"--color-primary-400": "221 221 221",
-	"--color-primary-500": "230 230 230",
-	"--color-primary-600": "240 240 240",
-	"--color-primary-700": "250 250 250",
-	"--color-primary-800": "253 253 253",
-	"--color-primary-900": "254 249 249",
-	"--color-primary-950": "253 252 252",
+	"--color-primary-0": "10 8 7", // Derived from Stone-950 (12 10 9) #0A0807
+	"--color-primary-50": "12 10 9", // Stone-950 #0C0A09
+	"--color-primary-100": "28 25 23", // Stone-900 #1C1917
+	"--color-primary-200": "41 37 36", // Stone-800 #292524
+	"--color-primary-300": "68 64 60", // Stone-700 #44403C
+	"--color-primary-400": "87 83 78", // Stone-600 #57534A
+	"--color-primary-500": "120 113 108", // Stone-500 #78716C
+	"--color-primary-600": "168 162 158", // Stone-400 #A8A29E
+	"--color-primary-700": "214 211 209", // Stone-300 #D6D3D1
+	"--color-primary-800": "231 229 228", // Stone-200 #E7E5E4
+	"--color-primary-900": "245 245 244", // Stone-100 #F5F5F4
+	"--color-primary-950": "250 250 249", // Stone-50 #FAFAFA
 
-	/* Secondary  */
-	"--color-secondary-0": "20 20 20",
-	"--color-secondary-50": "23 23 23",
-	"--color-secondary-100": "31 31 31",
-	"--color-secondary-200": "39 39 39",
-	"--color-secondary-300": "44 44 44",
-	"--color-secondary-400": "56 57 57",
-	"--color-secondary-500": "63 64 64",
-	"--color-secondary-600": "86 86 86",
-	"--color-secondary-700": "110 110 110",
-	"--color-secondary-800": "135 135 135",
-	"--color-secondary-900": "150 150 150",
-	"--color-secondary-950": "164 164 164",
+	/* Secondary (Stone) */
+	"--color-secondary-0": "10 8 7", // Derived from Stone-950 (12 10 9) #0A0807
+	"--color-secondary-50": "12 10 9", // Stone-950 #0C0A09
+	"--color-secondary-100": "28 25 23", // Stone-900 #1C1917
+	"--color-secondary-200": "41 37 36", // Stone-800 #292524
+	"--color-secondary-300": "68 64 60", // Stone-700 #44403C
+	"--color-secondary-400": "87 83 78", // Stone-600 #57534A
+	"--color-secondary-500": "120 113 108", // Stone-500 #78716C
+	"--color-secondary-600": "168 162 158", // Stone-400 #A8A29E
+	"--color-secondary-700": "214 211 209", // Stone-300 #D6D3D1
+	"--color-secondary-800": "231 229 228", // Stone-200 #E7E5E4
+	"--color-secondary-900": "245 245 244", // Stone-100 #F5F5F4
+	"--color-secondary-950": "250 250 249", // Stone-50 #FAFAFA
 
-	/* Tertiary */
-	"--color-tertiary-0": "84 49 18",
-	"--color-tertiary-50": "108 61 19",
-	"--color-tertiary-100": "130 73 23",
-	"--color-tertiary-200": "180 98 26",
-	"--color-tertiary-300": "215 117 31",
-	"--color-tertiary-400": "231 129 40",
-	"--color-tertiary-500": "251 157 75",
-	"--color-tertiary-600": "253 180 116",
-	"--color-tertiary-700": "254 209 170",
-	"--color-tertiary-800": "255 233 213",
-	"--color-tertiary-900": "255 242 229",
-	"--color-tertiary-950": "255 250 245",
+	/* Tertiary (Amber) */
+	"--color-tertiary-0": "65 21 8", // Derived from Amber-950 (67 21 8) #411508
+	"--color-tertiary-50": "67 21 8", // Amber-950 #431508
+	"--color-tertiary-100": "124 45 18", // Amber-900 #7C2D12
+	"--color-tertiary-200": "154 52 18", // Amber-800 #9A3412
+	"--color-tertiary-300": "194 65 12", // Amber-700 #C2410C
+	"--color-tertiary-400": "234 88 12", // Amber-600 #EA580C
+	"--color-tertiary-500": "249 115 22", // Amber-500 #F97316
+	"--color-tertiary-600": "251 146 60", // Amber-400 #FB923C
+	"--color-tertiary-700": "254 215 170", // Amber-200 #FED7AA
+	"--color-tertiary-800": "255 237 213", // Amber-100 #FFEDD5
+	"--color-tertiary-900": "255 247 237", // Amber-50 #FFF7ED
+	"--color-tertiary-950": "255 255 250", // Derived from Amber-50 (255 247 237) #FFFFFA
 
-	/* Error */
-	"--color-error-0": "83 19 19",
-	"--color-error-50": "127 29 29",
-	"--color-error-100": "153 27 27",
-	"--color-error-200": "185 28 28",
-	"--color-error-300": "220 38 38",
-	"--color-error-400": "230 53 53",
-	"--color-error-500": "239 68 68",
-	"--color-error-600": "249 97 96",
-	"--color-error-700": "229 91 90",
-	"--color-error-800": "254 202 202",
-	"--color-error-900": "254 226 226",
-	"--color-error-950": "254 233 233",
+	/* Error (Red) */
+	"--color-error-0": "66 9 9", // Derived from Red-950 (69 10 10) #420909
+	"--color-error-50": "69 10 10", // Red-950 #450A0A
+	"--color-error-100": "127 29 29", // Red-900 #7F1D1D
+	"--color-error-200": "153 27 27", // Red-800 #991B1B
+	"--color-error-300": "185 28 28", // Red-700 #B91C1C
+	"--color-error-400": "220 38 38", // Red-600 #DC2626
+	"--color-error-500": "239 68 68", // Red-500 #EF4444
+	"--color-error-600": "248 113 113", // Red-400 #F87171
+	"--color-error-700": "252 165 165", // Red-300 #FCA5A5
+	"--color-error-800": "254 202 202", // Red-200 #FECACA
+	"--color-error-900": "254 226 226", // Red-100 #FEE2E2
+	"--color-error-950": "254 242 242", // Red-50 #FEF2F2
 
-	/* Success */
-	"--color-success-0": "27 50 36",
-	"--color-success-50": "20 83 45",
-	"--color-success-100": "22 101 52",
-	"--color-success-200": "32 111 62",
-	"--color-success-300": "42 121 72",
-	"--color-success-400": "52 131 82",
-	"--color-success-500": "72 151 102",
-	"--color-success-600": "102 181 132",
-	"--color-success-700": "132 211 162",
-	"--color-success-800": "162 241 192",
-	"--color-success-900": "202 255 232",
-	"--color-success-950": "228 255 244",
+	/* Success (Green) */
+	"--color-success-0": "3 46 21", // Derived from Green-950 (3 46 21) #032E15
+	"--color-success-50": "3 46 21", // Green-950 #032E15
+	"--color-success-100": "13 84 43", // Green-900 #0D542B
+	"--color-success-200": "1 102 48", // Green-800 #016630
+	"--color-success-300": "0 130 54", // Green-700 #008236
+	"--color-success-400": "0 166 62", // Green-600 #00A63E
+	"--color-success-500": "0 201 80", // Green-500 #00C950
+	"--color-success-600": "5 223 114", // Green-400 #05DF72
+	"--color-success-700": "123 241 168", // Green-300 #7BF1A8
+	"--color-success-800": "185 248 207", // Green-200 #B9F8CF
+	"--color-success-900": "220 252 231", // Green-100 #DCFCE7
+	"--color-success-950": "240 253 244", // Green-50 #F0FDD4
 
-	/* Warning */
-	"--color-warning-0": "84 45 18",
-	"--color-warning-50": "108 56 19",
-	"--color-warning-100": "130 68 23",
-	"--color-warning-200": "180 90 26",
-	"--color-warning-300": "215 108 31",
-	"--color-warning-400": "231 120 40",
-	"--color-warning-500": "251 149 75",
-	"--color-warning-600": "253 173 116",
-	"--color-warning-700": "254 205 170",
-	"--color-warning-800": "255 231 213",
-	"--color-warning-900": "255 244 237",
-	"--color-warning-950": "255 249 245",
+	/* Warning (Yellow) */
+	"--color-warning-0": "64 29 5", // Derived from Yellow-950 (66 32 6) #401D05
+	"--color-warning-50": "66 32 6", // Yellow-950 #422006
+	"--color-warning-100": "113 63 18", // Yellow-900 #713F12
+	"--color-warning-200": "133 77 14", // Yellow-800 #854D0E
+	"--color-warning-300": "161 98 7", // Yellow-700 #A16207
+	"--color-warning-400": "202 138 4", // Yellow-600 #CA8A04
+	"--color-warning-500": "234 179 8", // Yellow-500 #EAB308
+	"--color-warning-600": "250 204 21", // Yellow-400 #FAC015
+	"--color-warning-700": "253 224 71", // Yellow-300 #FDE047
+	"--color-warning-800": "254 240 138", // Yellow-200 #FEEB8A
+	"--color-warning-900": "254 249 195", // Yellow-100 #FEF9C3
+	"--color-warning-950": "254 252 232", // Yellow-50 #FEFCE8
 
-	/* Info */
-	"--color-info-0": "3 38 56",
-	"--color-info-50": "5 64 93",
-	"--color-info-100": "7 90 131",
-	"--color-info-200": "9 115 168",
-	"--color-info-300": "11 141 205",
-	"--color-info-400": "13 166 242",
-	"--color-info-500": "50 180 244",
-	"--color-info-600": "87 194 246",
-	"--color-info-700": "124 207 248",
-	"--color-info-800": "162 221 250",
-	"--color-info-900": "199 235 252",
-	"--color-info-950": "236 248 254",
+	/* Info (Sky) */
+	"--color-info-0": "6 41 65", // Derived from Sky-950 (8 47 73) #062941
+	"--color-info-50": "8 47 73", // Sky-950 #082F49
+	"--color-info-100": "12 74 110", // Sky-900 #0C4A6E
+	"--color-info-200": "7 89 133", // Sky-800 #075985
+	"--color-info-300": "3 105 161", // Sky-700 #0369A1
+	"--color-info-400": "2 132 199", // Sky-600 #0284C7
+	"--color-info-500": "14 165 233", // Sky-500 #0EA5E9
+	"--color-info-600": "56 189 248", // Sky-400 #38BDF8
+	"--color-info-700": "125 211 252", // Sky-300 #7DD3FC
+	"--color-info-800": "186 230 253", // Sky-200 #BAE6FD
+	"--color-info-900": "224 242 254", // Sky-100 #E0F2FE
+	"--color-info-950": "240 249 255", // Sky-50 #F0F9FF
 
-	/* Typography */
-	"--color-typography-0": "23 23 23",
-	"--color-typography-50": "38 38 39",
-	"--color-typography-100": "64 64 64",
-	"--color-typography-200": "82 82 82",
-	"--color-typography-300": "115 115 115",
-	"--color-typography-400": "140 140 140",
-	"--color-typography-500": "163 163 163",
-	"--color-typography-600": "212 212 212",
-	"--color-typography-700": "219 219 220",
-	"--color-typography-800": "229 229 229",
-	"--color-typography-900": "245 245 245",
-	"--color-typography-950": "254 254 255",
+	/* Typography (Stone) */
+	"--color-typography-0": "10 8 7", // Derived from Stone-950 (12 10 9) #0A0807
+	"--color-typography-50": "12 10 9", // Stone-950 #0C0A09
+	"--color-typography-100": "28 25 23", // Stone-900 #1C1917
+	"--color-typography-200": "41 37 36", // Stone-800 #292524
+	"--color-typography-300": "68 64 60", // Stone-700 #44403C
+	"--color-typography-400": "87 83 78", // Stone-600 #57534A
+	"--color-typography-500": "120 113 108", // Stone-500 #78716C
+	"--color-typography-600": "168 162 158", // Stone-400 #A8A29E
+	"--color-typography-700": "214 211 209", // Stone-300 #D6D3D1
+	"--color-typography-800": "231 229 228", // Stone-200 #E7E5E4
+	"--color-typography-900": "245 245 244", // Stone-100 #F5F5F4
+	"--color-typography-950": "250 250 249", // Stone-50 #FAFAFA
 
-	/* Outline */
-	"--color-outline-0": "26 23 23",
-	"--color-outline-50": "39 38 36",
-	"--color-outline-100": "65 65 65",
-	"--color-outline-200": "83 82 82",
-	"--color-outline-300": "115 116 116",
-	"--color-outline-400": "140 141 141",
-	"--color-outline-500": "165 163 163",
-	"--color-outline-600": "211 211 211",
-	"--color-outline-700": "221 220 219",
-	"--color-outline-800": "230 230 230",
-	"--color-outline-900": "243 243 243",
-	"--color-outline-950": "253 254 254",
+	/* Outline (Stone) */
+	"--color-outline-0": "10 8 7", // Derived from Stone-950 (12 10 9) #0A0807
+	"--color-outline-50": "12 10 9", // Stone-950 #0C0A09
+	"--color-outline-100": "28 25 23", // Stone-900 #1C1917
+	"--color-outline-200": "41 37 36", // Stone-800 #292524
+	"--color-outline-300": "68 64 60", // Stone-700 #44403C
+	"--color-outline-400": "87 83 78", // Stone-600 #57534A
+	"--color-outline-500": "120 113 108", // Stone-500 #78716C
+	"--color-outline-600": "168 162 158", // Stone-400 #A8A29E
+	"--color-outline-700": "214 211 209", // Stone-300 #D6D3D1
+	"--color-outline-800": "231 229 228", // Stone-200 #E7E5E4
+	"--color-outline-900": "245 245 244", // Stone-100 #F5F5F4
+	"--color-outline-950": "250 250 249", // Stone-50 #FAFAFA
 
-	/* Background */
-	"--color-background-0": "18 18 18",
-	"--color-background-50": "39 38 37",
-	"--color-background-100": "65 64 64",
-	"--color-background-200": "83 82 82",
-	"--color-background-300": "116 116 116",
-	"--color-background-400": "142 142 142",
-	"--color-background-500": "162 163 163",
-	"--color-background-600": "213 212 212",
-	"--color-background-700": "229 228 228",
-	"--color-background-800": "242 241 241",
-	"--color-background-900": "246 246 246",
-	"--color-background-950": "255 255 255",
+	/* Background (Stone) */
+	"--color-background-0": "10 8 7", // Derived from Stone-950 (12 10 9) #0A0807
+	"--color-background-50": "12 10 9", // Stone-950 #0C0A09
+	"--color-background-100": "28 25 23", // Stone-900 #1C1917
+	"--color-background-200": "41 37 36", // Stone-800 #292524
+	"--color-background-300": "68 64 60", // Stone-700 #44403C
+	"--color-background-400": "87 83 78", // Stone-600 #57534A
+	"--color-background-500": "120 113 108", // Stone-500 #78716C
+	"--color-background-600": "168 162 158", // Stone-400 #A8A29E
+	"--color-background-700": "214 211 209", // Stone-300 #D6D3D1
+	"--color-background-800": "231 229 228", // Stone-200 #E7E5E4
+	"--color-background-900": "245 245 244", // Stone-100 #F5F5F4
+	"--color-background-950": "250 250 249", // Stone-50 #FAFAFA
 
 	/* Background Special */
-	"--color-background-error": "66 43 43",
-	"--color-background-warning": "65 47 35",
-	"--color-background-success": "28 43 33",
-	"--color-background-muted": "51 51 51",
-	"--color-background-info": "26 40 46",
+	"--color-background-error": "69 10 10", // Red-950 #450A0A
+	"--color-background-warning": "66 32 6", // Yellow-950 #422006
+	"--color-background-success": "3 46 21", // Green-950 #032E15
+	"--color-background-muted": "12 10 9", // Stone-950 #0C0A09
+	"--color-background-info": "8 47 73", // Sky-950 #082F49
 
-	/* Focus Ring Indicator  */
-	"--color-indicator-primary": "247 247 247",
-	"--color-indicator-info": "161 199 245",
-	"--color-indicator-error": "232 70 69",
+	/* Focus Ring Indicator */
+	"--color-indicator-primary": "168 162 158", // Stone-400 #A8A29E
+	"--color-indicator-info": "14 165 233", // Sky-500 #0EA5E9
+	"--color-indicator-error": "239 68 68", // Red-500 #EF4444
 } satisfies ThemeColorMap;
 
 const config = {
