@@ -1,6 +1,5 @@
 /** @format */
 
-import { Box } from "@/components/ui/box";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import {
 	Inter_400Regular,
@@ -17,14 +16,8 @@ import {
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React from "react";
-import { StatusBar } from "react-native";
-import {
-	SafeAreaView,
-	useSafeAreaInsets,
-} from "react-native-safe-area-context";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSystemColorScheme } from "@/hooks/use-color-scheme";
-import { useThemedColor } from "@/hooks/use-themed-color";
 import "../../global.css";
 
 export {
@@ -61,43 +54,17 @@ export default function RootLayout() {
 	return <RootLayoutNav />;
 }
 
-const SYSTEM_BARS_BG_COLOR = "background-900";
-
-const NavigationBarBackground = () => {
-	const insets = useSafeAreaInsets();
-	const navigationBarHeight = insets.bottom;
-	const { getHexColor } = useThemedColor();
-
-	return (
-		<Box
-			style={{
-				height: navigationBarHeight,
-				backgroundColor: getHexColor(SYSTEM_BARS_BG_COLOR),
-			}}
-		/>
-	);
-};
-
 function RootLayoutNav() {
 	const colorScheme = useSystemColorScheme();
-	const isDarkMode = colorScheme === "dark";
-	const { getHexColor } = useThemedColor();
+
 	return (
 		<GluestackUIProvider mode={colorScheme}>
-			<ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
+			<ThemeProvider
+				value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
 				<SafeAreaView
 					edges={["top", "left", "right"]}
-					className="flex-1 bg-background-500">
-					{/* Didn't use Expo StatusBar cause it just won't work */}
-					<StatusBar
-						animated
-						barStyle={isDarkMode ? "light-content" : "dark-content"}
-						backgroundColor={getHexColor(SYSTEM_BARS_BG_COLOR)}
-					/>
-
+					className="flex-1 bg-background-50 p-4 pb-0">
 					<Slot />
-
-					<NavigationBarBackground />
 				</SafeAreaView>
 			</ThemeProvider>
 		</GluestackUIProvider>
