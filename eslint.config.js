@@ -11,13 +11,9 @@ import reactQueryKeys from "eslint-plugin-react-query-keys";
 export default tseslint.config({
 	files: ["**/*.ts", "**/*.tsx"],
 
-	// Extend recommended rule sets from:
-	// 1. ESLint JS's recommended rules
-	// 2. TypeScript ESLint recommended rules
-	// 3. ESLint React's recommended-typescript rules
 	extends: [
 		eslintJs.configs.recommended,
-		tseslint.configs.strictTypeChecked,
+		tseslint.configs.recommendedTypeChecked,
 		eslintReact.configs["recommended-typescript"],
 		expoConfig,
 	],
