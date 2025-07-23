@@ -10,7 +10,12 @@
 		"newArchEnabled": true,
 		"android": {
 			"package": "com.openplayit.app",
-			"edgeToEdgeEnabled": true
+			"edgeToEdgeEnabled": true,
+			"permissions": [
+				"android.permission.READ_EXTERNAL_STORAGE",
+				"android.permission.WRITE_EXTERNAL_STORAGE",
+				"android.permission.ACCESS_MEDIA_LOCATION"
+			]
 		},
 		"web": {
 			"bundler": "metro",
@@ -29,7 +34,20 @@
 				}
 			],
 			"expo-font",
-			"expo-web-browser"
+			"expo-web-browser",
+			[
+				"expo-video",
+				{
+					"supportsBackgroundPlayback": true,
+					"supportsPictureInPicture": true
+				}
+			],
+			[
+				"expo-media-library",
+				{
+					"isAccessMediaLocationEnabled": true
+				}
+			]
 		],
 		"experiments": {
 			"typedRoutes": true
