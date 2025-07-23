@@ -143,7 +143,7 @@ const RecentlyWatchedVideos: React.FC<RecentlyWatchedVideosProps> = ({
 		),
 	);
 
-	const { width: playerWidth, height: playerHeight } = usePlayerDimensions();
+	const { width: playerWidth } = usePlayerDimensions();
 
 	return (
 		<FlashList
@@ -190,7 +190,11 @@ export default function VideoTab() {
 
 				<Box className="flex-row items-center gap-4">
 					{[Trash, Search, ArrowDownToLine].map((icon) => (
-						<Icon key={icon.name} as={icon} size={"xl"} />
+						<Icon
+							key={icon.name + icon.displayName}
+							as={icon}
+							size={"xl"}
+						/>
 					))}
 				</Box>
 			</Box>
