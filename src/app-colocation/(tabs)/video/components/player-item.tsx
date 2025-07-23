@@ -47,7 +47,7 @@ export const PlayerItem: React.FC<PlayerItemProps> = ({
 			try {
 				const { uri } = await VideoThumbnails.getThumbnailAsync(
 					videoUri,
-					{ time: 9000 },
+					{ time: 10000 },
 				);
 				if (!uri) console.warn("invalid thumbnail uri", uri);
 
