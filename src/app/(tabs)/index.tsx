@@ -21,6 +21,7 @@ import {
 	VIDEO_GAP,
 	WINDOW_SCREEN_PADDING,
 } from "@/app-colocation/(tabs)/video/constants";
+import { isObject } from "@/lib/utils";
 
 interface CreatePlayerPoolOptions {
 	size: number;
@@ -109,6 +110,12 @@ const RecentlyWatchedVideos: React.FC<RecentlyWatchedVideosProps> = ({
 					/>
 				);
 			}}
+			keyExtractor={(item, index) =>
+				String(
+					(isObject(item) ? (item.uri ?? item.assetId) : item) ??
+						index,
+				)
+			}
 			horizontal
 			showsHorizontalScrollIndicator={false}
 			estimatedItemSize={playerWidth}
