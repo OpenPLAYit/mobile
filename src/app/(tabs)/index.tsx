@@ -7,78 +7,20 @@ import { Image } from "@/components/ui/image";
 import { BRAND_NAME } from "@/constants";
 import { ArrowDownToLine, Search, Trash, Trash2 } from "lucide-react-native";
 
+import {
+	PlayerItem,
+	usePlayerDimensions,
+} from "@/app-colocation/(tabs)/video/components/player-item";
 import { useUserMediaVideos } from "@/app-colocation/(tabs)/video/use-user-media-videos";
 import { Text } from "@/components/ui/text";
-import { cn } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
-import {
-	createVideoPlayer,
-	VideoPlayer,
-	VideoView,
-	type VideoSource,
-	type VideoViewProps,
-} from "expo-video";
+import { createVideoPlayer, VideoPlayer, type VideoSource } from "expo-video";
 import React from "react";
-import { ActivityIndicator, useWindowDimensions } from "react-native";
-import { cssInterop } from "react-native-css-interop";
-
-cssInterop(VideoView, {
-	className: "style",
-});
-
-const WINDOW_SCREEN_PADDING = 16;
-const VIDEO_GAP = 12;
-const PLAYER_ASPECT_RATIO = 16 / 9;
-
-const usePlayerDimensions = () => {
-	const { width } = useWindowDimensions();
-
-	const totalHorizontalSpace = WINDOW_SCREEN_PADDING * 2 + VIDEO_GAP;
-	const playerWidth = (width - totalHorizontalSpace) / 2;
-	const playerHeight = playerWidth / PLAYER_ASPECT_RATIO;
-
-	return { width: playerWidth, height: playerHeight } satisfies {
-		width: number;
-		height: number;
-	};
-};
-
-interface PlayerItemProps extends VideoViewProps {
-	source: VideoSource;
-}
-const PlayerItem: React.FC<PlayerItemProps> = ({
-	source,
-	player,
-	className,
-	style,
-	...props
-}) => {
-	React.useEffect(() => {
-		// initialize the video into the player after first render only once.
-		player.replaceAsync(source).catch((e) => console.error(e));
-	}, [player, source]);
-
-	// const { isPlaying } = useEvent(player, "playingChange", {
-	// 	isPlaying: player.playing,
-	// });
-
-	const { width } = usePlayerDimensions();
-
-	return (
-		<VideoView
-			{...props}
-			player={player}
-			className={cn(className)}
-			style={[
-				{
-					width,
-					aspectRatio: PLAYER_ASPECT_RATIO,
-				},
-				style,
-			]}
-		/>
-	);
-};
+import { ActivityIndicator } from "react-native";
+import {
+	VIDEO_GAP,
+	WINDOW_SCREEN_PADDING,
+} from "@/app-colocation/(tabs)/video/constants";
 
 interface CreatePlayerPoolOptions {
 	size: number;
@@ -177,7 +119,9 @@ const RecentlyWatchedVideos: React.FC<RecentlyWatchedVideosProps> = ({
 export default function VideoTab() {
 	const { videos, isLoading, error } = useUserMediaVideos();
 	return (
-		<Box className="flex-1 gap-4 p-4">
+		<Box
+			className="flex-1 gap-4"
+			style={{ padding: WINDOW_SCREEN_PADDING }}>
 			{/* top bar */}
 			<Box className="mb-4 flex-row items-center justify-between">
 				<Image
