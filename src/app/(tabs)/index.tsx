@@ -7,7 +7,9 @@ import { Image } from "@/components/ui/image";
 import { BRAND_NAME } from "@/constants";
 import { ArrowDownToLine, Search, Trash, Trash2 } from "lucide-react-native";
 
-import { cn, isObject } from "@/lib/utils";
+import { useUserMediaVideos } from "@/app-colocation/(tabs)/video/use-user-media-videos";
+import { Text } from "@/components/ui/text";
+import { cn } from "@/lib/utils";
 import { FlashList } from "@shopify/flash-list";
 import {
 	createVideoPlayer,
@@ -17,7 +19,7 @@ import {
 	type VideoViewProps,
 } from "expo-video";
 import React from "react";
-import { useWindowDimensions } from "react-native";
+import { ActivityIndicator, useWindowDimensions } from "react-native";
 import { cssInterop } from "react-native-css-interop";
 
 cssInterop(VideoView, {
@@ -26,14 +28,19 @@ cssInterop(VideoView, {
 
 const WINDOW_SCREEN_PADDING = 16;
 const VIDEO_GAP = 12;
+const PLAYER_ASPECT_RATIO = 16 / 9;
 
-const usePlayerWidth = () => {
+const usePlayerDimensions = () => {
 	const { width } = useWindowDimensions();
 
 	const totalHorizontalSpace = WINDOW_SCREEN_PADDING * 2 + VIDEO_GAP;
 	const playerWidth = (width - totalHorizontalSpace) / 2;
+	const playerHeight = playerWidth / PLAYER_ASPECT_RATIO;
 
-	return playerWidth;
+	return { width: playerWidth, height: playerHeight } satisfies {
+		width: number;
+		height: number;
+	};
 };
 
 interface PlayerItemProps extends VideoViewProps {
@@ -55,16 +62,17 @@ const PlayerItem: React.FC<PlayerItemProps> = ({
 	// 	isPlaying: player.playing,
 	// });
 
-	const width = usePlayerWidth();
+	const { width } = usePlayerDimensions();
 
 	return (
 		<VideoView
 			{...props}
 			player={player}
-			className={cn("aspect-video", className)}
+			className={cn(className)}
 			style={[
 				{
 					width,
+					aspectRatio: PLAYER_ASPECT_RATIO,
 				},
 				style,
 			]}
@@ -135,7 +143,7 @@ const RecentlyWatchedVideos: React.FC<RecentlyWatchedVideosProps> = ({
 		),
 	);
 
-	const playerWidth = usePlayerWidth();
+	const { width: playerWidth, height: playerHeight } = usePlayerDimensions();
 
 	return (
 		<FlashList
@@ -159,12 +167,6 @@ const RecentlyWatchedVideos: React.FC<RecentlyWatchedVideosProps> = ({
 					/>
 				);
 			}}
-			keyExtractor={(item, index) =>
-				String(
-					(isObject(item) ? (item.uri ?? item.assetId) : item) ??
-						index,
-				)
-			}
 			horizontal
 			showsHorizontalScrollIndicator={false}
 			estimatedItemSize={playerWidth}
@@ -172,43 +174,8 @@ const RecentlyWatchedVideos: React.FC<RecentlyWatchedVideosProps> = ({
 	);
 };
 
-const videoSources = [
-	{
-		uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-	},
-	{
-		uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-	},
-	{
-		uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-	},
-	{
-		uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-	},
-	{
-		uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-	},
-	{
-		uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-	},
-	{
-		uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
-	},
-	{
-		uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnAVacation.mp4",
-	},
-	{
-		uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatIfWeAddA4thDimension.mp4",
-	},
-	{
-		uri: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
-	},
-	{
-		uri: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4",
-	},
-];
-
 export default function VideoTab() {
+	const { videos, isLoading, error } = useUserMediaVideos();
 	return (
 		<Box className="flex-1 gap-4 p-4">
 			{/* top bar */}
@@ -238,7 +205,13 @@ export default function VideoTab() {
 				{/* recently last watched videos
                 TODO: Replace videoSources with actual data
                 */}
-				<RecentlyWatchedVideos videos={videoSources} />
+				{isLoading ? (
+					<ActivityIndicator />
+				) : error ? (
+					<Text>{error.message}</Text>
+				) : (
+					<RecentlyWatchedVideos videos={videos} />
+				)}
 			</Box>
 		</Box>
 	);
