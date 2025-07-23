@@ -29,8 +29,7 @@ type UseUserMediaVideosReturn = UserMediaVideosState & {
 
 export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
 	const [state, setState] = React.useState<UserMediaVideosState>({
-		isLoading: false,
-		videos: [],
+		isLoading: true,
 	});
 
 	const [permissionResponse, requestPermission] =
@@ -38,8 +37,6 @@ export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
 
 	React.useEffect(() => {
 		const fetchVideos = async () => {
-			setState({ isLoading: true });
-
 			let { status } = permissionResponse || {};
 			if (status !== MediaLibrary.PermissionStatus.GRANTED) {
 				const permissionResult = await requestPermission();
@@ -57,14 +54,14 @@ export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
 			}
 
 			try {
-				const assets = await MediaLibrary.getAssetsAsync({
+				const { assets } = await MediaLibrary.getAssetsAsync({
 					mediaType: MediaLibrary.MediaType.video,
 					sortBy: [[MediaLibrary.SortBy.modificationTime, false]],
 					first: 50,
 				});
 
 				setState({
-					videos: assets.assets,
+					videos: assets,
 					isLoading: false,
 				});
 			} catch (e) {
@@ -79,7 +76,7 @@ export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
 			}
 		};
 
-		fetchVideos().catch(() => {});
+		fetchVideos().catch(console.error);
 	}, [permissionResponse, requestPermission]);
 
 	return {
