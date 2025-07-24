@@ -114,7 +114,7 @@ export const PlayerItem: React.FC<PlayerItemProps> = ({
 					size="full"
 				/>
 			) : (
-				<Icon as={Play} />
+				<Icon as={Play} classNameColor="text-green-500" />
 			)}
 		</TouchableOpacity>
 	);
