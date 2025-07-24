@@ -49,7 +49,11 @@ export const PlayerItem: React.FC<PlayerItemProps> = ({
 					videoUri,
 					{ time: 10000 },
 				);
-				if (!uri) console.warn("invalid thumbnail uri", uri);
+				if (!uri)
+					console.warn(
+						`invalid generated thumbnail uri - "${uri}", for video`,
+						videoUri,
+					);
 
 				setThumbnailUri(uri);
 			} catch (e) {
