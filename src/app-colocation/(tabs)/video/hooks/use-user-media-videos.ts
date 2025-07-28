@@ -57,7 +57,7 @@ export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
 				const { assets } = await MediaLibrary.getAssetsAsync({
 					mediaType: MediaLibrary.MediaType.video,
 					sortBy: [[MediaLibrary.SortBy.modificationTime, false]],
-					first: 50,
+					first: 6,
 				});
 
 				setState({

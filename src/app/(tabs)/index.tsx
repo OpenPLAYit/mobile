@@ -7,22 +7,18 @@ import { Image } from "@/components/ui/image";
 import { BRAND_NAME } from "@/constants";
 import { ArrowDownToLine, Search, Trash, Trash2 } from "lucide-react-native";
 
-import {
-	PlayerItem,
-	usePlayerDimensions,
-} from "@/app-colocation/(tabs)/video/components/player-item";
+import { VideoMediaPlayer } from "@/app-colocation/(tabs)/video/components/video-media-player";
 import {
 	VIDEO_GAP,
 	WINDOW_SCREEN_PADDING,
 } from "@/app-colocation/(tabs)/video/constants";
-import { useUserMediaVideos } from "@/app-colocation/(tabs)/video/use-user-media-videos";
+import { PlayerProvider } from "@/app-colocation/(tabs)/video/player-context";
 import { Text } from "@/components/ui/text";
 import { isObject } from "@/lib/utils";
-import { FlashList } from "@shopify/flash-list";
 import { type VideoSource } from "expo-video";
 import React from "react";
-import { ActivityIndicator } from "react-native";
-import { PlayerProvider } from "@/app-colocation/(tabs)/video/player-context";
+import { ActivityIndicator, ScrollView } from "react-native";
+import { useUserMediaVideos } from "@/app-colocation/(tabs)/video/hooks/use-user-media-videos";
 
 interface RecentlyWatchedVideosProps {
 	videos: VideoSource[];
@@ -30,32 +26,26 @@ interface RecentlyWatchedVideosProps {
 const RecentlyWatchedVideos: React.FC<RecentlyWatchedVideosProps> = ({
 	videos,
 }) => {
-	const { width: playerWidth } = usePlayerDimensions();
-
 	return (
-		<FlashList
-			data={videos}
-			renderItem={({ item, index }) => {
-				return (
-					<PlayerItem
-						source={item}
-						style={{
-							marginRight:
-								index === videos.length - 1 ? 0 : VIDEO_GAP,
-						}}
-					/>
-				);
-			}}
-			keyExtractor={(item, index) =>
-				String(
-					(isObject(item) ? (item.uri ?? item.assetId) : item) ??
-						index,
-				)
-			}
+		<ScrollView
 			horizontal
 			showsHorizontalScrollIndicator={false}
-			estimatedItemSize={playerWidth}
-		/>
+			className="flex-row">
+			{videos.map((video, index) => (
+				<VideoMediaPlayer
+					key={
+						(isObject(video)
+							? (video.uri ?? video.assetId)
+							: video) ?? index
+					}
+					source={video}
+					style={{
+						marginRight:
+							index === videos.length - 1 ? 0 : VIDEO_GAP,
+					}}
+				/>
+			))}
+		</ScrollView>
 	);
 };
 
