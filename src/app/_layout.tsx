@@ -19,6 +19,7 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Box } from "@/components/ui/box";
+import { PortalHost } from "@/components/ui/portal";
 import { useSystemColorScheme } from "@/hooks/use-color-scheme";
 import "../../global.css";
 
@@ -68,6 +69,7 @@ function RootLayoutNav() {
 						<Stack initialRouteName="(tabs)" />
 					</SafeAreaView>
 				</Box>
+				<PortalHost />
 			</ThemeProvider>
 		</GluestackUIProvider>
 	);
