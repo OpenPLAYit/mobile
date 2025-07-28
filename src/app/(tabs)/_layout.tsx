@@ -1,6 +1,8 @@
 /** @format */
 
 import { Icon } from "@/components/ui/icon";
+import { PortalHost } from "@/components/ui/portal";
+import { FULLSCREEN_VIDEO_THUMBNAIL_PORTAL_HOST } from "@/constants";
 import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
 import { Stack, Tabs } from "expo-router";
 import { Music, User, Video, type LucideIcon } from "lucide-react-native";
@@ -97,6 +99,8 @@ export default function TabLayout() {
 					/>
 				))}
 			</CustomTabs>
+
+			<PortalHost name={FULLSCREEN_VIDEO_THUMBNAIL_PORTAL_HOST} />
 		</>
 	);
 }
