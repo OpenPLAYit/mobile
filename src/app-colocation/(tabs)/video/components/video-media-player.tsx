@@ -70,7 +70,7 @@ export interface VideoMediaPlayerProps
 	source: VideoSource;
 }
 
-export const VideoMediaPlayer: React.FC<VideoMediaPlayerProps> = ({
+const VideoMediaPlayer_: React.FC<VideoMediaPlayerProps> = ({
 	source,
 	className,
 	style,
@@ -208,3 +208,7 @@ export const VideoMediaPlayer: React.FC<VideoMediaPlayerProps> = ({
 		</View>
 	);
 };
+
+export const VideoMediaPlayer = React.memo(
+	VideoMediaPlayer_,
+) as typeof VideoMediaPlayer_;
