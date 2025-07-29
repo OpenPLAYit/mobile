@@ -36,7 +36,7 @@ export interface DatedVideoCollection {
  */
 interface InitialLoadingState {
 	isInitialLoading: true;
-	videoCollection?: never;
+	videoCollections?: never;
 	isFetchingMore?: never;
 	endCursor?: never;
 	hasNextPage?: never;
@@ -49,7 +49,7 @@ interface InitialLoadingState {
 interface InitialErrorState {
 	isInitialLoading: false;
 	error: Error;
-	videoCollection?: never;
+	videoCollections?: never;
 	isFetchingMore?: never;
 	endCursor?: never;
 	hasNextPage?: never;
@@ -61,7 +61,7 @@ interface InitialErrorState {
  */
 interface LoadedIdleHasNextPageState {
 	isInitialLoading: false;
-	videoCollection: DatedVideoCollection[];
+	videoCollections: DatedVideoCollection[];
 	isFetchingMore: false;
 	endCursor: string;
 	hasNextPage: true;
@@ -74,7 +74,7 @@ interface LoadedIdleHasNextPageState {
  */
 interface LoadedIdleNoNextPageState {
 	isInitialLoading: false;
-	videoCollection: DatedVideoCollection[];
+	videoCollections: DatedVideoCollection[];
 	isFetchingMore: false;
 	endCursor: string | null; // 'string | null' to allow API's actual return when hasNextPage is false
 	hasNextPage: false;
@@ -91,7 +91,7 @@ type LoadedIdleState = LoadedIdleHasNextPageState | LoadedIdleNoNextPageState;
  */
 interface LoadedFetchingMoreState {
 	isInitialLoading: false;
-	videoCollection: DatedVideoCollection[];
+	videoCollections: DatedVideoCollection[];
 	isFetchingMore: true;
 	endCursor: string;
 	hasNextPage: true;
@@ -103,7 +103,7 @@ interface LoadedFetchingMoreState {
  */
 interface SubsequentErrorState {
 	isInitialLoading: false;
-	videoCollection: DatedVideoCollection[];
+	videoCollections: DatedVideoCollection[];
 	isFetchingMore: false;
 	endCursor: string | null;
 	hasNextPage: boolean;
@@ -117,7 +117,7 @@ type UserMediaVideosState =
 	| LoadedFetchingMoreState
 	| SubsequentErrorState;
 
-type UseUserMediaVideosReturn = UserMediaVideosState & {
+export type UseUserMediaVideosReturn = UserMediaVideosState & {
 	permissionResponse: MediaLibrary.PermissionResponse | null;
 	requestPermission: () => Promise<MediaLibrary.PermissionResponse>;
 	fetchMore: () => Promise<void>;
@@ -129,14 +129,14 @@ type UserMediaVideosAction =
 			type: "INITIAL_FETCH_SUCCESS_HAS_NEXT";
 			payload: Pick<
 				LoadedIdleHasNextPageState,
-				"videoCollection" | "endCursor" | "hasNextPage"
+				"videoCollections" | "endCursor" | "hasNextPage"
 			>;
 	  }
 	| {
 			type: "INITIAL_FETCH_SUCCESS_NO_NEXT";
 			payload: Pick<
 				LoadedIdleNoNextPageState,
-				"videoCollection" | "endCursor" | "hasNextPage"
+				"videoCollections" | "endCursor" | "hasNextPage"
 			>;
 	  }
 	| {
@@ -252,7 +252,7 @@ const wasFetchingMore = (
 ): s is LoadedFetchingMoreState =>
 	!!s.isFetchingMore &&
 	!s.isInitialLoading &&
-	!!s.videoCollection &&
+	!!s.videoCollections &&
 	!s.error;
 
 const userMediaVideosReducer = (
@@ -267,7 +267,7 @@ const userMediaVideosReducer = (
 			return {
 				isInitialLoading: false,
 				isFetchingMore: false,
-				videoCollection: action.payload.videoCollection,
+				videoCollections: action.payload.videoCollections,
 				endCursor: action.payload.endCursor,
 				hasNextPage: true,
 			} satisfies LoadedIdleHasNextPageState;
@@ -276,7 +276,7 @@ const userMediaVideosReducer = (
 			return {
 				isInitialLoading: false,
 				isFetchingMore: false,
-				videoCollection: action.payload.videoCollection,
+				videoCollections: action.payload.videoCollections,
 				endCursor: action.payload.endCursor,
 				hasNextPage: false,
 			} satisfies LoadedIdleNoNextPageState;
@@ -302,14 +302,14 @@ const userMediaVideosReducer = (
 
 		case "FETCH_MORE_SUCCESS_HAS_NEXT":
 			if (wasFetchingMore(state)) {
-				const updatedVideoCollection = addAssetsToExistingCollections({
-					existingCollections: state.videoCollection,
+				const updatedvideoCollections = addAssetsToExistingCollections({
+					existingCollections: state.videoCollections,
 					newAssets: action.payload.newAssets,
 				});
 				return {
 					...state,
 					isFetchingMore: false,
-					videoCollection: updatedVideoCollection,
+					videoCollections: updatedvideoCollections,
 					endCursor: action.payload.endCursor,
 					hasNextPage: true,
 				} satisfies LoadedIdleHasNextPageState;
@@ -322,14 +322,14 @@ const userMediaVideosReducer = (
 
 		case "FETCH_MORE_SUCCESS_NO_NEXT":
 			if (wasFetchingMore(state)) {
-				const updatedVideoCollection = addAssetsToExistingCollections({
-					existingCollections: state.videoCollection,
+				const updatedvideoCollections = addAssetsToExistingCollections({
+					existingCollections: state.videoCollections,
 					newAssets: action.payload.newAssets,
 				});
 				return {
 					...state,
 					isFetchingMore: false,
-					videoCollection: updatedVideoCollection,
+					videoCollections: updatedvideoCollections,
 					endCursor: action.payload.endCursor,
 					hasNextPage: false,
 				} satisfies LoadedIdleNoNextPageState;
@@ -409,13 +409,13 @@ export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
 						first: 50,
 					});
 
-				const videoCollection = createCollectionsFromAssets(assets);
+				const videoCollections = createCollectionsFromAssets(assets);
 
 				if (hasNextPage) {
 					dispatch({
 						type: "INITIAL_FETCH_SUCCESS_HAS_NEXT",
 						payload: {
-							videoCollection,
+							videoCollections,
 							endCursor: endCursor,
 							hasNextPage: true,
 						},
@@ -426,7 +426,7 @@ export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
 				dispatch({
 					type: "INITIAL_FETCH_SUCCESS_NO_NEXT",
 					payload: {
-						videoCollection,
+						videoCollections,
 						endCursor,
 						hasNextPage: false,
 					},
