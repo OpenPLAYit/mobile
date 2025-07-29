@@ -22,7 +22,7 @@ const MONTH_NAMES = [
 type MonthName = (typeof MONTH_NAMES)[number];
 type Year = number;
 
-interface DatedVideoCollection {
+export interface DatedVideoCollection {
 	month: MonthName;
 	year: Year;
 	/**
@@ -31,77 +31,351 @@ interface DatedVideoCollection {
 	videos: VideoSource[];
 }
 
+/**
+ * State when the initial fetch of user media videos is in progress.
+ */
+interface InitialLoadingState {
+	isInitialLoading: true;
+	videoCollection?: never;
+	isFetchingMore?: never;
+	endCursor?: never;
+	hasNextPage?: never;
+	error?: never;
+}
+
+/**
+ * State when an error occurred during the initial fetch of user media videos.
+ */
+interface InitialErrorState {
+	isInitialLoading: false;
+	error: Error;
+	videoCollection?: never;
+	isFetchingMore?: never;
+	endCursor?: never;
+	hasNextPage?: never;
+}
+
+/**
+ * State when user media videos are loaded, no active fetch is in progress,
+ * and there are more pages of videos to fetch.
+ */
+interface LoadedIdleHasNextPageState {
+	isInitialLoading: false;
+	videoCollection: DatedVideoCollection[];
+	isFetchingMore: false;
+	endCursor: string;
+	hasNextPage: true;
+	error?: never;
+}
+
+/**
+ * State when user media videos are loaded, no active fetch is in progress,
+ * and there are no more pages of videos to fetch.
+ */
+interface LoadedIdleNoNextPageState {
+	isInitialLoading: false;
+	videoCollection: DatedVideoCollection[];
+	isFetchingMore: false;
+	endCursor: string | null; // 'string | null' to allow API's actual return when hasNextPage is false
+	hasNextPage: false;
+	error?: never;
+}
+
+/**
+ * State when user media videos are loaded and no active fetch is in progress.
+ */
+type LoadedIdleState = LoadedIdleHasNextPageState | LoadedIdleNoNextPageState;
+
+/**
+ * State when user media videos are loaded and a new batch is being fetched.
+ */
+interface LoadedFetchingMoreState {
+	isInitialLoading: false;
+	videoCollection: DatedVideoCollection[];
+	isFetchingMore: true;
+	endCursor: string;
+	hasNextPage: true;
+	error?: never;
+}
+
+/**
+ * State when a subsequent fetch for more user media videos failed.
+ */
+interface SubsequentErrorState {
+	isInitialLoading: false;
+	videoCollection: DatedVideoCollection[];
+	isFetchingMore: false;
+	endCursor: string | null;
+	hasNextPage: boolean;
+	error: Error;
+}
+
 type UserMediaVideosState =
-	// Initial loading state: The very first batch of videos is being fetched.
-	| {
-			/**
-			 * Indicates that the initial fetch of videos is in progress.
-			 */
-			isInitialLoading: true;
-			videoCollection?: never;
-			isFetchingMore?: never;
-			endCursor?: never;
-			hasNextPage?: never;
-			error?: never;
-	  }
-	// Error state during initial fetch: No videos could be loaded initially.
-	| {
-			/**
-			 * Indicates that the initial fetch has completed.
-			 */
-			isInitialLoading: false;
-			/**
-			 * An error object if the initial fetch failed.
-			 */
-			error: Error;
-			videoCollection?: never;
-			isFetchingMore?: never;
-			endCursor?: never;
-			hasNextPage?: never;
-	  }
-	// Data loaded state: Videos are available, and potentially more can be fetched.
-	| {
-			/**
-			 * Indicates that the initial fetch has completed.
-			 */
-			isInitialLoading: false;
-			videoCollection: DatedVideoCollection[];
-			isFetchingMore: boolean;
-			/**
-			 * The cursor to use for fetching the next batch of videos, or `null` if no cursor exists yet.
-			 */
-			endCursor: string | null;
-			hasNextPage: boolean;
-			error?: never;
-	  }
-	// Error during subsequent fetch: Existing videos are still available, but fetching more failed.
-	| {
-			/**
-			 * Indicates that the initial fetch has completed.
-			 */
-			isInitialLoading: false;
-			videoCollection: DatedVideoCollection[];
-			isFetchingMore: false;
-			/**
-			 * The cursor to use for potentially retrying the next batch, or `null`.
-			 */
-			endCursor: string | null;
-			hasNextPage: boolean;
-			/**
-			 * An error object if a subsequent fetch for more videos failed.
-			 */
-			error: Error;
-	  };
+	| InitialLoadingState
+	| InitialErrorState
+	| LoadedIdleState
+	| LoadedFetchingMoreState
+	| SubsequentErrorState;
 
 type UseUserMediaVideosReturn = UserMediaVideosState & {
 	permissionResponse: MediaLibrary.PermissionResponse | null;
 	requestPermission: () => Promise<MediaLibrary.PermissionResponse>;
+	fetchMore: () => Promise<void>;
 };
 
+type UserMediaVideosAction =
+	| { type: "INITIAL_FETCH_START" }
+	| {
+			type: "INITIAL_FETCH_SUCCESS_HAS_NEXT";
+			payload: Pick<
+				LoadedIdleHasNextPageState,
+				"videoCollection" | "endCursor" | "hasNextPage"
+			>;
+	  }
+	| {
+			type: "INITIAL_FETCH_SUCCESS_NO_NEXT";
+			payload: Pick<
+				LoadedIdleNoNextPageState,
+				"videoCollection" | "endCursor" | "hasNextPage"
+			>;
+	  }
+	| {
+			type: "INITIAL_FETCH_FAILURE";
+			payload: Pick<InitialErrorState, "error">;
+	  }
+	| { type: "FETCH_MORE_REQUEST" }
+	| {
+			type: "FETCH_MORE_SUCCESS_HAS_NEXT";
+			payload: Pick<
+				LoadedIdleHasNextPageState,
+				"endCursor" | "hasNextPage"
+			> & {
+				newAssets: MediaLibrary.Asset[];
+			};
+	  }
+	| {
+			type: "FETCH_MORE_SUCCESS_NO_NEXT";
+			payload: Pick<
+				LoadedIdleNoNextPageState,
+				"endCursor" | "hasNextPage"
+			> & {
+				newAssets: MediaLibrary.Asset[];
+			};
+	  }
+	| {
+			type: "FETCH_MORE_FAILURE";
+			payload: Pick<SubsequentErrorState, "error">;
+	  };
+
+type GroupKey = `${MonthName}-${Year}`;
+
+const addAssetToCollectionMap = ({
+	collectionMap,
+	asset,
+}: {
+	collectionMap: Map<GroupKey, DatedVideoCollection>;
+	asset: MediaLibrary.Asset;
+}) => {
+	const modificationDate = new Date(asset.modificationTime);
+	const year = modificationDate.getFullYear();
+	const month = MONTH_NAMES[modificationDate.getMonth()];
+
+	if (!month) {
+		throw new Error("Invalid month derived from asset modification date.");
+	}
+
+	const groupKey = `${month}-${year}` satisfies GroupKey;
+
+	let collection = collectionMap.get(groupKey);
+
+	if (!collection) {
+		collection = {
+			month: month,
+			year: year,
+			videos: [asset],
+		};
+		collectionMap.set(groupKey, collection);
+	} else {
+		collection.videos = [...collection.videos, asset];
+	}
+};
+
+const createCollectionsFromAssets = (
+	assets: MediaLibrary.Asset[],
+): DatedVideoCollection[] => {
+	const groupedCollectionsMap = new Map<GroupKey, DatedVideoCollection>();
+
+	assets.forEach((asset) => {
+		addAssetToCollectionMap({
+			collectionMap: groupedCollectionsMap,
+			asset,
+		});
+	});
+
+	return [...groupedCollectionsMap.values()];
+};
+
+const addAssetsToExistingCollections = ({
+	existingCollections,
+	newAssets,
+}: {
+	existingCollections: DatedVideoCollection[];
+	newAssets: MediaLibrary.Asset[];
+}): DatedVideoCollection[] => {
+	const collectionMap = new Map<GroupKey, DatedVideoCollection>();
+	existingCollections.forEach((collection) => {
+		const groupKey =
+			`${collection.month}-${collection.year}` satisfies GroupKey;
+		collectionMap.set(groupKey, {
+			...collection,
+			videos: [...collection.videos],
+		});
+	});
+
+	newAssets.forEach((asset) => {
+		addAssetToCollectionMap({ collectionMap, asset });
+	});
+
+	return [...collectionMap.values()];
+};
+
+const canFetchMore = (
+	s: UserMediaVideosState,
+): s is LoadedIdleHasNextPageState =>
+	!!s.hasNextPage &&
+	!!s.endCursor &&
+	!s.isInitialLoading &&
+	!s.isFetchingMore;
+
+const wasFetchingMore = (
+	s: UserMediaVideosState,
+): s is LoadedFetchingMoreState =>
+	!!s.isFetchingMore &&
+	!s.isInitialLoading &&
+	!!s.videoCollection &&
+	!s.error;
+
+const userMediaVideosReducer = (
+	state: UserMediaVideosState,
+	action: UserMediaVideosAction,
+): UserMediaVideosState => {
+	switch (action.type) {
+		case "INITIAL_FETCH_START":
+			return { isInitialLoading: true } satisfies InitialLoadingState;
+
+		case "INITIAL_FETCH_SUCCESS_HAS_NEXT":
+			return {
+				isInitialLoading: false,
+				isFetchingMore: false,
+				videoCollection: action.payload.videoCollection,
+				endCursor: action.payload.endCursor,
+				hasNextPage: true,
+			} satisfies LoadedIdleHasNextPageState;
+
+		case "INITIAL_FETCH_SUCCESS_NO_NEXT":
+			return {
+				isInitialLoading: false,
+				isFetchingMore: false,
+				videoCollection: action.payload.videoCollection,
+				endCursor: action.payload.endCursor,
+				hasNextPage: false,
+			} satisfies LoadedIdleNoNextPageState;
+
+		case "INITIAL_FETCH_FAILURE":
+			return {
+				isInitialLoading: false,
+				error: action.payload.error,
+			} satisfies InitialErrorState;
+
+		case "FETCH_MORE_REQUEST":
+			if (canFetchMore(state)) {
+				return {
+					...state,
+					isFetchingMore: true,
+				};
+			}
+			console.error(
+				`[Reducer] ${action.type}: Not in expected idle state.`,
+				state,
+			);
+			return state;
+
+		case "FETCH_MORE_SUCCESS_HAS_NEXT":
+			if (wasFetchingMore(state)) {
+				const updatedVideoCollection = addAssetsToExistingCollections({
+					existingCollections: state.videoCollection,
+					newAssets: action.payload.newAssets,
+				});
+				return {
+					...state,
+					isFetchingMore: false,
+					videoCollection: updatedVideoCollection,
+					endCursor: action.payload.endCursor,
+					hasNextPage: true,
+				} satisfies LoadedIdleHasNextPageState;
+			}
+			console.error(
+				`[Reducer] ${action.type}: Not in expected fetching state.`,
+				state,
+			);
+			return state;
+
+		case "FETCH_MORE_SUCCESS_NO_NEXT":
+			if (wasFetchingMore(state)) {
+				const updatedVideoCollection = addAssetsToExistingCollections({
+					existingCollections: state.videoCollection,
+					newAssets: action.payload.newAssets,
+				});
+				return {
+					...state,
+					isFetchingMore: false,
+					videoCollection: updatedVideoCollection,
+					endCursor: action.payload.endCursor,
+					hasNextPage: false,
+				} satisfies LoadedIdleNoNextPageState;
+			}
+			console.error(
+				`[Reducer] ${action.type}: Not in expected fetching state.`,
+				state,
+			);
+			return state;
+
+		case "FETCH_MORE_FAILURE":
+			if (wasFetchingMore(state)) {
+				return {
+					...state,
+					isFetchingMore: false,
+					error: action.payload.error,
+				} satisfies SubsequentErrorState;
+			}
+			console.error(
+				`[Reducer] ${action.type}: Not in expected fetching state.`,
+				state,
+			);
+			return state;
+
+		default:
+			return state;
+	}
+};
+
+const normalizeError = (err: unknown): Error =>
+	err instanceof Error
+		? err
+		: new Error(
+				typeof err === "string" ? err : "An unknown error occurred.",
+			);
+
 export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
-	const [state, setState] = React.useState<UserMediaVideosState>({
+	const [state, dispatch] = React.useReducer(userMediaVideosReducer, {
 		isInitialLoading: true,
 	});
+
+	/**stateRef to always hold the latest state for stable async operations */
+	const stateRef = React.useRef(state);
+	React.useEffect(() => {
+		stateRef.current = state;
+	}, [state]);
 
 	const [permissionResponse, requestPermission] =
 		MediaLibrary.usePermissions();
@@ -115,17 +389,19 @@ export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
 			}
 
 			if (status !== MediaLibrary.PermissionStatus.GRANTED) {
-				setState({
-					error: new Error(
-						"Permission to access media library not granted.",
-					),
-					isInitialLoading: false,
+				dispatch({
+					type: "INITIAL_FETCH_FAILURE",
+					payload: {
+						error: new Error(
+							"Permission to access media library not granted.",
+						),
+					},
 				});
 				return;
 			}
 
+			dispatch({ type: "INITIAL_FETCH_START" });
 			try {
-				// --- Initial getAssetsAsync Call ---
 				const { assets, endCursor, hasNextPage } =
 					await MediaLibrary.getAssetsAsync({
 						mediaType: MediaLibrary.MediaType.video,
@@ -133,60 +409,32 @@ export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
 						first: 50,
 					});
 
-				// Process and group raw assets into DatedVideoCollection
-				type GroupKey = `${MonthName}-${Year}`;
-				const groupedCollectionsMap = new Map<
-					GroupKey,
-					DatedVideoCollection
-				>();
+				const videoCollection = createCollectionsFromAssets(assets);
 
-				assets.forEach((asset) => {
-					const modificationDate = new Date(asset.modificationTime);
-					const year = modificationDate.getFullYear();
-					const month = MONTH_NAMES[modificationDate.getMonth()];
-					if (!month) {
-						throw new Error(
-							"invalid month from modification date.",
-						);
-					}
+				if (hasNextPage) {
+					dispatch({
+						type: "INITIAL_FETCH_SUCCESS_HAS_NEXT",
+						payload: {
+							videoCollection,
+							endCursor: endCursor,
+							hasNextPage: true,
+						},
+					});
+					return;
+				}
 
-					const groupKey = `${month}-${year}` satisfies GroupKey;
-
-					let collection = groupedCollectionsMap.get(groupKey);
-
-					if (!collection) {
-						collection = {
-							month: month,
-							year: year,
-							videos: [],
-						};
-						groupedCollectionsMap.set(groupKey, collection);
-					}
-					collection.videos = [...collection.videos, asset];
-				});
-
-				// --- Convert to final videoCollection from map ---
-				// TODO: Might require sorting later on.
-				const videoCollection = [
-					...groupedCollectionsMap.values(),
-				] satisfies DatedVideoCollection[];
-
-				// Update State with Initial Data and Pagination Info
-				setState({
-					isInitialLoading: false,
-					videoCollection,
-					isFetchingMore: false,
-					endCursor,
-					hasNextPage,
+				dispatch({
+					type: "INITIAL_FETCH_SUCCESS_NO_NEXT",
+					payload: {
+						videoCollection,
+						endCursor,
+						hasNextPage: false,
+					},
 				});
 			} catch (e) {
-				const error: Error =
-					e instanceof Error
-						? e
-						: new Error("An unknown error occurred.");
-				setState({
-					error,
-					isInitialLoading: false,
+				dispatch({
+					type: "INITIAL_FETCH_FAILURE",
+					payload: { error: normalizeError(e) },
 				});
 			}
 		};
@@ -194,9 +442,63 @@ export const useUserMediaVideos = (): UseUserMediaVideosReturn => {
 		fetchVideos().catch(console.error);
 	}, [permissionResponse, requestPermission]);
 
+	const fetchMore = React.useCallback(async () => {
+		const currentState = stateRef.current;
+
+		if (!canFetchMore(currentState)) {
+			console.warn(
+				"[fetchMore] Cannot fetch more, current state:",
+				currentState,
+			);
+			return;
+		}
+
+		dispatch({ type: "FETCH_MORE_REQUEST" });
+
+		try {
+			const {
+				assets: newlyFetchedAssets,
+				endCursor: newEndCursor,
+				hasNextPage: newHasNextPage,
+			} = await MediaLibrary.getAssetsAsync({
+				after: currentState.endCursor,
+				first: 50,
+				mediaType: MediaLibrary.MediaType.video,
+				sortBy: [[MediaLibrary.SortBy.modificationTime, false]],
+			});
+
+			if (newHasNextPage) {
+				dispatch({
+					type: "FETCH_MORE_SUCCESS_HAS_NEXT",
+					payload: {
+						newAssets: newlyFetchedAssets,
+						endCursor: newEndCursor,
+						hasNextPage: true,
+					},
+				});
+				return;
+			}
+
+			dispatch({
+				type: "FETCH_MORE_SUCCESS_NO_NEXT",
+				payload: {
+					newAssets: newlyFetchedAssets,
+					endCursor: newEndCursor,
+					hasNextPage: false,
+				},
+			});
+		} catch (e) {
+			dispatch({
+				type: "FETCH_MORE_FAILURE",
+				payload: { error: normalizeError(e) },
+			});
+		}
+	}, []);
+
 	return {
 		...state,
 		permissionResponse,
 		requestPermission,
+		fetchMore,
 	};
 };
