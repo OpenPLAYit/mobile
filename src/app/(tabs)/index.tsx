@@ -7,6 +7,7 @@ import { Image } from "@/components/ui/image";
 import { BRAND_NAME } from "@/constants";
 import { ArrowDownToLine, Search, Trash, Trash2 } from "lucide-react-native";
 
+import { VideoCollectionSectionsList } from "@/app-colocation/(tabs)/video/components/video-collection-sections-list";
 import { VideoMediaPlayer } from "@/app-colocation/(tabs)/video/components/video-media-player";
 import {
 	VIDEO_GAP,
@@ -18,7 +19,7 @@ import { Text } from "@/components/ui/text";
 import { isObject } from "@/lib/utils";
 import { type VideoSource } from "expo-video";
 import React from "react";
-import { ActivityIndicator, FlatList, ScrollView } from "react-native";
+import { ActivityIndicator, ScrollView } from "react-native";
 
 interface RecentlyWatchedVideosProps {
 	videos: VideoSource[];
@@ -50,7 +51,15 @@ const RecentlyWatchedVideos: React.FC<RecentlyWatchedVideosProps> = ({
 };
 
 export default function VideoTab() {
-	const { videoCollection, isInitialLoading, error } = useUserMediaVideos();
+	const {
+		videoCollections,
+		isInitialLoading,
+		error,
+		isFetchingMore,
+		hasNextPage,
+		fetchMore,
+	} = useUserMediaVideos();
+
 	return (
 		<PlayerProvider>
 			<Box
@@ -82,7 +91,7 @@ export default function VideoTab() {
 					<ActivityIndicator />
 				) : error ? (
 					<Text>{error.message}</Text>
-				) : videoCollection.length ? (
+				) : videoCollections.length ? (
 					<Box className="flex-1 gap-4">
 						<Box className="gap-2">
 							<Box className="flex-row items-center justify-between">
@@ -94,60 +103,14 @@ export default function VideoTab() {
 							<RecentlyWatchedVideos videos={[]} />
 						</Box>
 
-						<Box className="gap-2">
+						<Box className="flex-1 gap-2">
 							<Heading size="xs">Video</Heading>
 
-							<FlatList
-								data={videoCollection}
-								keyExtractor={({ month, year }, index) =>
-									month + year + index
-								}
-								showsVerticalScrollIndicator={false}
-								renderItem={({ item }) => {
-									return (
-										<Box className="mb-2 gap-2">
-											<Heading
-												size="xs"
-												className="!text-2xs capitalize">
-												{item.month.slice(0, 3)},{" "}
-												{item.year}
-											</Heading>
-
-											<FlatList
-												data={item.videos}
-												keyExtractor={(item, index) =>
-													String(
-														isObject(item)
-															? (item.uri ??
-																	item.assetId)
-															: index,
-													)
-												}
-												renderItem={({
-													item,
-													index: videoIndex,
-												}) => {
-													return (
-														<VideoMediaPlayer
-															source={item}
-															style={{
-																marginRight:
-																	videoIndex %
-																		2 ===
-																	0
-																		? VIDEO_GAP
-																		: 0,
-																marginBottom:
-																	VIDEO_GAP,
-															}}
-														/>
-													);
-												}}
-												numColumns={2}
-											/>
-										</Box>
-									);
-								}}
+							<VideoCollectionSectionsList
+								collectionsList={videoCollections}
+								hasNextPage={hasNextPage}
+								isFetchingMore={isFetchingMore}
+								fetchMore={fetchMore}
 							/>
 						</Box>
 					</Box>
