@@ -168,32 +168,33 @@ type ThemeColorKey = keyof typeof lightThemeMap;
 type ThemeColorMap = Record<ThemeColorKey, ColorValue>;
 
 const darkThemeMap = {
-	"--color-primary-0": "10 8 7", // Derived from Stone-950 (12 10 9) #0A0807
-	"--color-primary-50": "12 10 9", // Stone-950 #0C0A09
-	"--color-primary-100": "28 25 23", // Stone-900 #1C1917
-	"--color-primary-200": "41 37 36", // Stone-800 #292524
-	"--color-primary-300": "68 64 60", // Stone-700 #44403C
-	"--color-primary-400": "87 83 78", // Stone-600 #57534A
-	"--color-primary-500": "120 113 108", // Stone-500 #78716C
-	"--color-primary-600": "168 162 158", // Stone-400 #A8A29E
-	"--color-primary-700": "214 211 209", // Stone-300 #D6D3D1
-	"--color-primary-800": "231 229 228", // Stone-200 #E7E5E4
-	"--color-primary-900": "245 245 244", // Stone-100 #F5F5F4
-	"--color-primary-950": "250 250 249", // Stone-50 #FAFAFA
+	/* Primary (Gray) */
+	"--color-primary-0": "0 0 0", // Pure Black #000000
+	"--color-primary-50": "8 8 8", // Deep Gray-950 #080808
+	"--color-primary-100": "20 20 20", // Deep Gray-900 #141414
+	"--color-primary-200": "40 40 40", // Gray-800 #282828
+	"--color-primary-300": "65 65 65", // Gray-700 #414141
+	"--color-primary-400": "90 90 90", // Gray-600 #5A5A5A
+	"--color-primary-500": "120 120 120", // Gray-500 #787878
+	"--color-primary-600": "160 160 160", // Gray-400 #A0A0A0
+	"--color-primary-700": "200 200 200", // Gray-300 #C8C8C8
+	"--color-primary-800": "225 225 225", // Gray-200 #E1E1E1
+	"--color-primary-900": "245 245 245", // Very Light Gray-100 #F5F5F5
+	"--color-primary-950": "255 255 255", // Pure White #FFFFFF
 
-	/* Secondary (Stone) */
-	"--color-secondary-0": "10 8 7", // Derived from Stone-950 (12 10 9) #0A0807
-	"--color-secondary-50": "12 10 9", // Stone-950 #0C0A09
-	"--color-secondary-100": "28 25 23", // Stone-900 #1C1917
-	"--color-secondary-200": "41 37 36", // Stone-800 #292524
-	"--color-secondary-300": "68 64 60", // Stone-700 #44403C
-	"--color-secondary-400": "87 83 78", // Stone-600 #57534A
-	"--color-secondary-500": "120 113 108", // Stone-500 #78716C
-	"--color-secondary-600": "168 162 158", // Stone-400 #A8A29E
-	"--color-secondary-700": "214 211 209", // Stone-300 #D6D3D1
-	"--color-secondary-800": "231 229 228", // Stone-200 #E7E5E4
-	"--color-secondary-900": "245 245 244", // Stone-100 #F5F5F4
-	"--color-secondary-950": "250 250 249", // Stone-50 #FAFAFA
+	/* Secondary (Gray) */
+	"--color-secondary-0": "0 0 0", // Pure Black #000000
+	"--color-secondary-50": "8 8 8", // Deep Gray-950 #080808
+	"--color-secondary-100": "20 20 20", // Deep Gray-900 #141414
+	"--color-secondary-200": "40 40 40", // Gray-800 #282828
+	"--color-secondary-300": "65 65 65", // Gray-700 #414141
+	"--color-secondary-400": "90 90 90", // Gray-600 #5A5A5A
+	"--color-secondary-500": "120 120 120", // Gray-500 #787878
+	"--color-secondary-600": "160 160 160", // Gray-400 #A0A0A0
+	"--color-secondary-700": "200 200 200", // Gray-300 #C8C8C8
+	"--color-secondary-800": "225 225 225", // Gray-200 #E1E1E1
+	"--color-secondary-900": "245 245 245", // Very Light Gray-100 #F5F5F5
+	"--color-secondary-950": "255 255 255", // Pure White #FFFFFF
 
 	/* Tertiary (Amber) */
 	"--color-tertiary-0": "65 21 8", // Derived from Amber-950 (67 21 8) #411508
@@ -206,12 +207,12 @@ const darkThemeMap = {
 	"--color-tertiary-600": "251 146 60", // Amber-400 #FB923C
 	"--color-tertiary-700": "254 215 170", // Amber-200 #FED7AA
 	"--color-tertiary-800": "255 237 213", // Amber-100 #FFEDD5
-	"--color-tertiary-900": "255 247 237", // Amber-50 #FFF7ED
-	"--color-tertiary-950": "255 255 250", // Derived from Amber-50 (255 247 237) #FFFFFA
+	"--color-tertiary-900": "255 240 220", // Very Light Amber #FFF0DC
+	"--color-tertiary-950": "255 250 240", // Lightest Amber #FFFAD0
 
 	/* Error (Red) */
-	"--color-error-0": "66 9 9", // Derived from Red-950 (69 10 10) #420909
-	"--color-error-50": "69 10 10", // Red-950 #450A0A
+	"--color-error-0": "75 10 10", // Deeper Red-950 #4B0A0A
+	"--color-error-50": "85 15 15", // Deeper Red-900 #550F0F
 	"--color-error-100": "127 29 29", // Red-900 #7F1D1D
 	"--color-error-200": "153 27 27", // Red-800 #991B1B
 	"--color-error-300": "185 28 28", // Red-700 #B91C1C
@@ -220,12 +221,12 @@ const darkThemeMap = {
 	"--color-error-600": "248 113 113", // Red-400 #F87171
 	"--color-error-700": "252 165 165", // Red-300 #FCA5A5
 	"--color-error-800": "254 202 202", // Red-200 #FECACA
-	"--color-error-900": "254 226 226", // Red-100 #FEE2E2
-	"--color-error-950": "254 242 242", // Red-50 #FEF2F2
+	"--color-error-900": "255 200 200", // Light Red-100 #FFC8C8
+	"--color-error-950": "255 230 230", // Lightest Red-50 #FFE6E6
 
 	/* Success (Green) */
-	"--color-success-0": "3 46 21", // Derived from Green-950 (3 46 21) #032E15
-	"--color-success-50": "3 46 21", // Green-950 #032E15
+	"--color-success-0": "1 30 10", // Deeper Green-950 #011E0A
+	"--color-success-50": "5 50 25", // Deeper Green-900 #053219
 	"--color-success-100": "13 84 43", // Green-900 #0D542B
 	"--color-success-200": "1 102 48", // Green-800 #016630
 	"--color-success-300": "0 130 54", // Green-700 #008236
@@ -234,22 +235,22 @@ const darkThemeMap = {
 	"--color-success-600": "5 223 114", // Green-400 #05DF72
 	"--color-success-700": "123 241 168", // Green-300 #7BF1A8
 	"--color-success-800": "185 248 207", // Green-200 #B9F8CF
-	"--color-success-900": "220 252 231", // Green-100 #DCFCE7
-	"--color-success-950": "240 253 244", // Green-50 #F0FDD4
+	"--color-success-900": "200 250 200", // Light Green-100 #C8FAC8
+	"--color-success-950": "230 255 230", // Lightest Green-50 #E6FFE6
 
 	/* Warning (Yellow) */
-	"--color-warning-0": "64 29 5", // Derived from Yellow-950 (66 32 6) #401D05
-	"--color-warning-50": "66 32 6", // Yellow-950 #422006
-	"--color-warning-100": "113 63 18", // Yellow-900 #713F12
-	"--color-warning-200": "133 77 14", // Yellow-800 #854D0E
-	"--color-warning-300": "161 98 7", // Yellow-700 #A16207
-	"--color-warning-400": "202 138 4", // Yellow-600 #CA8A04
+	"--color-warning-0": "45 30 5", // Deepest Yellow #2D1E05
+	"--color-warning-50": "80 50 10", // Deeper Yellow #50320A
+	"--color-warning-100": "130 90 20", // Dark Yellow #825A14
+	"--color-warning-200": "160 110 25", // Yellow-800 #A06E19
+	"--color-warning-300": "190 140 30", // Yellow-700 #BE8C1E
+	"--color-warning-400": "220 170 40", // Yellow-600 #DCA128
 	"--color-warning-500": "234 179 8", // Yellow-500 #EAB308
 	"--color-warning-600": "250 204 21", // Yellow-400 #FAC015
 	"--color-warning-700": "253 224 71", // Yellow-300 #FDE047
 	"--color-warning-800": "254 240 138", // Yellow-200 #FEEB8A
-	"--color-warning-900": "254 249 195", // Yellow-100 #FEF9C3
-	"--color-warning-950": "254 252 232", // Yellow-50 #FEFCE8
+	"--color-warning-900": "255 240 180", // Light Yellow #FFF0B4
+	"--color-warning-950": "255 245 200", // Lightest Yellow #FFF5C8
 
 	/* Info (Sky) */
 	"--color-info-0": "6 41 65", // Derived from Sky-950 (8 47 73) #062941
@@ -262,60 +263,60 @@ const darkThemeMap = {
 	"--color-info-600": "56 189 248", // Sky-400 #38BDF8
 	"--color-info-700": "125 211 252", // Sky-300 #7DD3FC
 	"--color-info-800": "186 230 253", // Sky-200 #BAE6FD
-	"--color-info-900": "224 242 254", // Sky-100 #E0F2FE
-	"--color-info-950": "240 249 255", // Sky-50 #F0F9FF
+	"--color-info-900": "200 230 255", // Light Sky #C8E6FF
+	"--color-info-950": "220 240 255", // Lightest Sky #DCF0FF
 
-	/* Typography (Stone) */
-	"--color-typography-0": "10 8 7", // Derived from Stone-950 (12 10 9) #0A0807
-	"--color-typography-50": "12 10 9", // Stone-950 #0C0A09
-	"--color-typography-100": "28 25 23", // Stone-900 #1C1917
-	"--color-typography-200": "41 37 36", // Stone-800 #292524
-	"--color-typography-300": "68 64 60", // Stone-700 #44403C
-	"--color-typography-400": "87 83 78", // Stone-600 #57534A
-	"--color-typography-500": "120 113 108", // Stone-500 #78716C
-	"--color-typography-600": "168 162 158", // Stone-400 #A8A29E
-	"--color-typography-700": "214 211 209", // Stone-300 #D6D3D1
-	"--color-typography-800": "231 229 228", // Stone-200 #E7E5E4
-	"--color-typography-900": "245 245 244", // Stone-100 #F5F5F4
-	"--color-typography-950": "250 250 249", // Stone-50 #FAFAFA
+	/* Typography (Gray) */
+	"--color-typography-0": "0 0 0", // Pure Black #000000
+	"--color-typography-50": "8 8 8", // Deep Gray-950 #080808
+	"--color-typography-100": "20 20 20", // Deep Gray-900 #141414
+	"--color-typography-200": "40 40 40", // Gray-800 #282828
+	"--color-typography-300": "65 65 65", // Gray-700 #414141
+	"--color-typography-400": "90 90 90", // Gray-600 #5A5A5A
+	"--color-typography-500": "120 120 120", // Gray-500 #787878
+	"--color-typography-600": "160 160 160", // Gray-400 #A0A0A0
+	"--color-typography-700": "200 200 200", // Gray-300 #C8C8C8
+	"--color-typography-800": "225 225 225", // Gray-200 #E1E1E1
+	"--color-typography-900": "245 245 245", // Very Light Gray-100 #F5F5F5
+	"--color-typography-950": "255 255 255", // Pure White #FFFFFF
 
-	/* Outline (Stone) */
-	"--color-outline-0": "10 8 7", // Derived from Stone-950 (12 10 9) #0A0807
-	"--color-outline-50": "12 10 9", // Stone-950 #0C0A09
-	"--color-outline-100": "28 25 23", // Stone-900 #1C1917
-	"--color-outline-200": "41 37 36", // Stone-800 #292524
-	"--color-outline-300": "68 64 60", // Stone-700 #44403C
-	"--color-outline-400": "87 83 78", // Stone-600 #57534A
-	"--color-outline-500": "120 113 108", // Stone-500 #78716C
-	"--color-outline-600": "168 162 158", // Stone-400 #A8A29E
-	"--color-outline-700": "214 211 209", // Stone-300 #D6D3D1
-	"--color-outline-800": "231 229 228", // Stone-200 #E7E5E4
-	"--color-outline-900": "245 245 244", // Stone-100 #F5F5F4
-	"--color-outline-950": "250 250 249", // Stone-50 #FAFAFA
+	/* Outline (Gray) */
+	"--color-outline-0": "0 0 0", // Pure Black #000000
+	"--color-outline-50": "8 8 8", // Deep Gray-950 #080808
+	"--color-outline-100": "20 20 20", // Deep Gray-900 #141414
+	"--color-outline-200": "40 40 40", // Gray-800 #282828
+	"--color-outline-300": "65 65 65", // Gray-700 #414141
+	"--color-outline-400": "90 90 90", // Gray-600 #5A5A5A
+	"--color-outline-500": "120 120 120", // Gray-500 #787878
+	"--color-outline-600": "160 160 160", // Gray-400 #A0A0A0
+	"--color-outline-700": "200 200 200", // Gray-300 #C8C8C8
+	"--color-outline-800": "225 225 225", // Gray-200 #E1E1E1
+	"--color-outline-900": "245 245 245", // Very Light Gray-100 #F5F5F5
+	"--color-outline-950": "255 255 255", // Pure White #FFFFFF
 
-	/* Background (Stone) */
-	"--color-background-0": "10 8 7", // Derived from Stone-950 (12 10 9) #0A0807
-	"--color-background-50": "12 10 9", // Stone-950 #0C0A09
-	"--color-background-100": "28 25 23", // Stone-900 #1C1917
-	"--color-background-200": "41 37 36", // Stone-800 #292524
-	"--color-background-300": "68 64 60", // Stone-700 #44403C
-	"--color-background-400": "87 83 78", // Stone-600 #57534A
-	"--color-background-500": "120 113 108", // Stone-500 #78716C
-	"--color-background-600": "168 162 158", // Stone-400 #A8A29E
-	"--color-background-700": "214 211 209", // Stone-300 #D6D3D1
-	"--color-background-800": "231 229 228", // Stone-200 #E7E5E4
-	"--color-background-900": "245 245 244", // Stone-100 #F5F5F4
-	"--color-background-950": "250 250 249", // Stone-50 #FAFAFA
+	/* Background (Gray) */
+	"--color-background-0": "0 0 0", // Pure Black #000000
+	"--color-background-50": "8 8 8", // Deep Gray-950 #080808
+	"--color-background-100": "20 20 20", // Deep Gray-900 #141414
+	"--color-background-200": "40 40 40", // Gray-800 #282828
+	"--color-background-300": "65 65 65", // Gray-700 #414141
+	"--color-background-400": "90 90 90", // Gray-600 #5A5A5A
+	"--color-background-500": "120 120 120", // Gray-500 #787878
+	"--color-background-600": "160 160 160", // Gray-400 #A0A0A0
+	"--color-background-700": "200 200 200", // Gray-300 #C8C8C8
+	"--color-background-800": "225 225 225", // Gray-200 #E1E1E1
+	"--color-background-900": "245 245 245", // Very Light Gray-100 #F5F5F5
+	"--color-background-950": "255 255 255", // Pure White #FFFFFF
 
 	/* Background Special */
-	"--color-background-error": "69 10 10", // Red-950 #450A0A
-	"--color-background-warning": "66 32 6", // Yellow-950 #422006
-	"--color-background-success": "3 46 21", // Green-950 #032E15
-	"--color-background-muted": "12 10 9", // Stone-950 #0C0A09
-	"--color-background-info": "8 47 73", // Sky-950 #082F49
+	"--color-background-error": "85 15 15", // Red-50 #550F0F
+	"--color-background-warning": "80 50 10", // Yellow-50 #50320A
+	"--color-background-success": "5 50 25", // Green-50 #053219
+	"--color-background-muted": "15 15 15", // Deep Gray #0F0F0F
+	"--color-background-info": "8 47 73", // Sky-50 #082F49
 
 	/* Focus Ring Indicator */
-	"--color-indicator-primary": "168 162 158", // Stone-400 #A8A29E
+	"--color-indicator-primary": "160 160 160", // Gray-600 #A0A0A0
 	"--color-indicator-info": "14 165 233", // Sky-500 #0EA5E9
 	"--color-indicator-error": "239 68 68", // Red-500 #EF4444
 } satisfies ThemeColorMap;

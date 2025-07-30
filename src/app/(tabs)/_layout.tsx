@@ -82,9 +82,9 @@ export default function TabLayout() {
 		<>
 			<Stack.Screen options={{ headerShown: false }} />
 			<CustomTabs
-				tabBarActiveTintColor="text-green-500"
-				tabBarInactiveTintColor="text-stone-400"
-				tabBarClassName="border-t-[0.5px] border-stone-800 h-16 overflow-hidden py-0 bg-black">
+				tabBarActiveTintColor="text-success-500"
+				tabBarInactiveTintColor="text-primary-400"
+				tabBarClassName="border-t-[0.5px] border-outline-100 h-16 overflow-hidden py-0 bg-background-0">
 				{tabsMap.map(({ name, title, icon }) => (
 					<Tabs.Screen
 						key={name}
