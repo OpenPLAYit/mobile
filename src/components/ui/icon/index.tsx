@@ -5,6 +5,7 @@ import { type VariantProps } from "@gluestack-ui/nativewind-utils";
 import { tva } from "@gluestack-ui/nativewind-utils/tva";
 import { cssInterop } from "nativewind";
 import React from "react";
+import type { SvgProps } from "react-native-svg";
 
 export const UIIcon = createIcon({
 	Root: PrimitiveIcon,
@@ -40,13 +41,16 @@ cssInterop(UIIcon, {
 	},
 });
 
-type BaseIconProps = VariantProps<typeof iconStyle> &
-	React.ComponentProps<typeof UIIcon>;
-type IConProps = Prettify<
+type BaseIconProps = SafeOmit<
+	VariantProps<typeof iconStyle> & React.ComponentProps<typeof UIIcon>,
+	"style"
+> &
+	Pick<SvgProps, "style">;
+type IconProps = Prettify<
 	BaseIconProps | (SafeOmit<BaseIconProps, "size"> & { size?: number })
 >;
 
-const Icon: React.FC<IConProps> = ({ size = "md", className, ...props }) => {
+const Icon: React.FC<IconProps> = ({ size = "md", className, ...props }) => {
 	if (typeof size === "number") {
 		return (
 			<UIIcon
@@ -69,6 +73,7 @@ const Icon: React.FC<IConProps> = ({ size = "md", className, ...props }) => {
 };
 
 export { Icon };
+export type { IconProps };
 
 type ParameterTypes = Omit<Parameters<typeof createIcon>[0], "Root">;
 
