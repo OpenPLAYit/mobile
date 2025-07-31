@@ -5,14 +5,12 @@ import { Heading } from "@/components/ui/heading";
 
 import { VideoMediaPlayer } from "@/app-colocation/(tabs)/video/components/video-media-player";
 import { VIDEO_GAP } from "@/app-colocation/(tabs)/video/constants";
-import {
-	type DatedVideoCollection,
-	type UseUserMediaVideosReturn,
-} from "@/app-colocation/(tabs)/video/hooks/use-user-media-videos";
+import { type UseUserVideosReturn } from "@/app-colocation/(tabs)/video/hooks/use-user-videos";
 import { Text } from "@/components/ui/text";
 import { isObject } from "@/lib/utils";
 import React from "react";
 import { ActivityIndicator, FlatList } from "react-native";
+import type { DatedVideoCollection } from "../hooks/use-user-videos/types";
 
 interface VideoCollectionSectionProps {
 	collection: DatedVideoCollection;
@@ -55,7 +53,7 @@ const VideoCollectionSection = React.memo(
 
 interface VideoCollectionSectionsListProps
 	extends Pick<
-		UseUserMediaVideosReturn,
+		UseUserVideosReturn,
 		"hasNextPage" | "isFetchingMore" | "fetchMore"
 	> {
 	collectionsList: DatedVideoCollection[];
