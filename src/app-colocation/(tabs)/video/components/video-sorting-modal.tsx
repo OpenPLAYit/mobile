@@ -30,7 +30,7 @@ type SortKey = (typeof SORT_KEYS)[number];
 const SORT_ORDERS = ["descending", "ascending"] as const;
 type SortOrder = (typeof SORT_ORDERS)[number];
 
-interface SortingState {
+export interface SortingState {
 	key: SortKey;
 	selected: SortOrder;
 }
@@ -128,18 +128,18 @@ const SortOrderGroup: React.FC<SortOrderGroupProps> = ({
 
 export interface VideoSortingModalProps {
 	onSortingChange: (state: SortingState) => void;
+	sortingState: SortingState;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 export const VideoSortingModal: React.FC<VideoSortingModalProps> = ({
 	onSortingChange,
+	sortingState: externalSortingState,
 	open,
 	onOpenChange,
 }) => {
-	const [sortingState, setSortingState] = React.useState<SortingState>({
-		key: "date",
-		selected: "descending",
-	});
+	const [optimisticSortingState, setOptimisticSortingState] =
+		React.useState<SortingState>(externalSortingState);
 
 	return (
 		<Modal isOpen={open} onClose={() => onOpenChange(false)}>
@@ -155,9 +155,9 @@ export const VideoSortingModal: React.FC<VideoSortingModalProps> = ({
 					<Box className="gap-4">
 						<RadioGroup
 							className="gap-4"
-							value={sortingState.key}
+							value={optimisticSortingState.key}
 							onChange={(key: SortKey) =>
-								setSortingState({
+								setOptimisticSortingState({
 									key,
 									selected: "descending",
 								})
@@ -177,9 +177,9 @@ export const VideoSortingModal: React.FC<VideoSortingModalProps> = ({
 						<Divider />
 
 						<SortOrderGroup
-							sortingState={sortingState}
+							sortingState={optimisticSortingState}
 							onOrderChange={(order) =>
-								setSortingState((prevState) => ({
+								setOptimisticSortingState((prevState) => ({
 									...prevState,
 									selected: order,
 								}))
@@ -196,7 +196,7 @@ export const VideoSortingModal: React.FC<VideoSortingModalProps> = ({
 					<ModalCloseButton
 						onPress={() => {
 							onOpenChange(false);
-							onSortingChange(sortingState);
+							onSortingChange(optimisticSortingState);
 						}}>
 						<Text className="font-semibold text-success-500">
 							OK
