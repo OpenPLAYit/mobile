@@ -5,15 +5,26 @@ import { Heading } from "@/components/ui/heading";
 import { Icon } from "@/components/ui/icon";
 import { Image } from "@/components/ui/image";
 import { BRAND_NAME } from "@/constants";
-import { ArrowDownToLine, Search, Trash, Trash2 } from "lucide-react-native";
+import {
+	ArrowDownToLine,
+	ArrowUpDown,
+	Search,
+	Trash,
+	Trash2,
+} from "lucide-react-native";
 
+import { IconButton } from "@/app-colocation/(tabs)/video/components/icon-button";
 import { VideoCollectionSectionsList } from "@/app-colocation/(tabs)/video/components/video-collection-sections-list";
 import { VideoMediaPlayer } from "@/app-colocation/(tabs)/video/components/video-media-player";
+import {
+	VideoSortingModal,
+	type VideoSortingModalProps,
+} from "@/app-colocation/(tabs)/video/components/video-sorting-modal";
 import {
 	VIDEO_GAP,
 	WINDOW_SCREEN_PADDING,
 } from "@/app-colocation/(tabs)/video/constants";
-import { useUserMediaVideos } from "@/app-colocation/(tabs)/video/hooks/use-user-media-videos";
+import { useUserVideos } from "@/app-colocation/(tabs)/video/hooks/use-user-videos";
 import { PlayerProvider } from "@/app-colocation/(tabs)/video/player-context";
 import { Text } from "@/components/ui/text";
 import { isObject } from "@/lib/utils";
@@ -50,6 +61,25 @@ const RecentlyWatchedVideos: React.FC<RecentlyWatchedVideosProps> = ({
 	);
 };
 
+// Extracted comp to avoid rerendering parent when modal opens or closes.
+const SortingModal: React.FC<
+	Pick<VideoSortingModalProps, "onSortingChange" | "sortingState">
+> = ({ onSortingChange, sortingState }) => {
+	const [isOpen, setIsOpen] = React.useState(false);
+
+	return (
+		<>
+			<IconButton as={ArrowUpDown} onPress={() => setIsOpen(true)} />
+			<VideoSortingModal
+				sortingState={sortingState}
+				onSortingChange={onSortingChange}
+				open={isOpen}
+				onOpenChange={setIsOpen}
+			/>
+		</>
+	);
+};
+
 export default function VideoTab() {
 	const {
 		videoCollections,
@@ -58,7 +88,9 @@ export default function VideoTab() {
 		isFetchingMore,
 		hasNextPage,
 		fetchMore,
-	} = useUserMediaVideos();
+		changeSorting,
+		sortedBy,
+	} = useUserVideos();
 
 	return (
 		<PlayerProvider>
@@ -104,7 +136,16 @@ export default function VideoTab() {
 						</Box>
 
 						<Box className="flex-1 gap-2">
-							<Heading size="xs">Video</Heading>
+							<Box className="flex-row items-center justify-between">
+								<Heading size="xs">Video</Heading>
+
+								<Box>
+									<SortingModal
+										sortingState={sortedBy}
+										onSortingChange={changeSorting}
+									/>
+								</Box>
+							</Box>
 
 							<VideoCollectionSectionsList
 								collectionsList={videoCollections}
