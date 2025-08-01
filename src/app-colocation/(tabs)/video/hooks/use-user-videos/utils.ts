@@ -108,39 +108,15 @@ export const normalizeError = (err: unknown): Error =>
 				typeof err === "string" ? err : "An unknown error occurred.",
 			);
 
-type EXSupportedSortKey = AssertSubtype<
-	SortingState["key"],
-	"date" | "duration"
->;
-
-type EXSupportedSortingState = AssertSubtype<
-	SortingState,
-	{
-		key: EXSupportedSortKey;
-		selected: SortingState["selected"];
-	}
->;
-
-const EXSUPPORTED_SORTING_KEYS = [
-	"date",
-	"duration",
-] satisfies EXSupportedSortKey[];
-
-export const isEXSupportedSorting = (
-	sorting: SortingState,
-): sorting is EXSupportedSortingState =>
-	EXSUPPORTED_SORTING_KEYS.some((key) => key === sorting.key);
-
 interface GetVideoAssetsOptions {
-	/**Only date and duration sorting is supported internally. */
-	sortedBy: EXSupportedSortingState;
+	sortedBy: SortingState;
 	afterCursor: string | null;
 }
 export const getVideoAssets = async ({
 	sortedBy,
 	afterCursor,
 }: GetVideoAssetsOptions) => {
-	// NOTE: Support for name and size sorting is handled externally.
+	// NOTE: Support for name and size sorting isn't supported by Expo.
 	let sorting: [
 		SafeExtract<MediaLibrary.SortByValue, "modificationTime" | "duration">,
 		boolean,
@@ -161,7 +137,7 @@ export const getVideoAssets = async ({
 
 	const assetsOptions = {
 		after: afterCursor ?? undefined,
-		first: 200,
+		first: 100,
 		mediaType: MediaLibrary.MediaType.video,
 		sortBy: [sorting], // must be nested in an array to work
 	} satisfies MediaLibrary.AssetsOptions;
