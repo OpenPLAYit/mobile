@@ -3,50 +3,14 @@
 import { Box } from "@/components/ui/box";
 import { Heading } from "@/components/ui/heading";
 
-import { VideoMediaPlayer } from "@/app-colocation/(tabs)/video/components/video-media-player";
 import { VIDEO_GAP } from "@/app-colocation/(tabs)/video/constants";
 import { type UseUserVideosReturn } from "@/app-colocation/(tabs)/video/hooks/use-user-videos";
 import { Text } from "@/components/ui/text";
 import React from "react";
-import { ActivityIndicator, FlatList } from "react-native";
+import { ActivityIndicator, FlatList, type ListRenderItem } from "react-native";
 import type { DatedVideoCollection } from "../hooks/use-user-videos/types";
-
-interface VideoCollectionSectionProps {
-	collection: DatedVideoCollection;
-}
-const VideoCollectionSection_: React.FC<VideoCollectionSectionProps> = ({
-	collection,
-}) => {
-	return (
-		<Box className="mb-2 gap-2">
-			<Heading size="xs" className="!text-2xs capitalize">
-				{collection.month.slice(0, 3)}, {collection.year}
-			</Heading>
-
-			<FlatList
-				data={collection.videos}
-				keyExtractor={(item) => item.id}
-				renderItem={({ item, index: videoIndex }) => {
-					return (
-						<VideoMediaPlayer
-							source={item}
-							style={{
-								marginRight:
-									videoIndex % 2 === 0 ? VIDEO_GAP : 0,
-								marginBottom: VIDEO_GAP,
-							}}
-						/>
-					);
-				}}
-				numColumns={2}
-			/>
-		</Box>
-	);
-};
-
-const VideoCollectionSection = React.memo(
-	VideoCollectionSection_,
-) as typeof VideoCollectionSection_;
+import type { VideoAsset } from "../types";
+import { VideoMediaThumbnail } from "./video-thumbnail";
 
 interface VideoCollectionSectionsListProps
 	extends Pick<
@@ -71,14 +35,107 @@ const FetchingMoreIndicator: React.FC<{ isFetchingMore: boolean }> = ({
 	);
 };
 
+type FlattenedListItem =
+	| {
+			type: "heading";
+			value: Pick<DatedVideoCollection, "month" | "year">;
+	  }
+	| {
+			type: "separator";
+			value: null;
+	  }
+	| {
+			type: "video";
+			value: VideoAsset;
+	  };
+
+const flattenCollectionsList = (list: DatedVideoCollection[]) => {
+	const flatArr: FlattenedListItem[] = [];
+
+	list.forEach(({ month, year, videos }) => {
+		flatArr.push({
+			type: "heading",
+			value: { month, year },
+		});
+		flatArr.push({
+			type: "separator",
+			value: null,
+		});
+		videos.forEach((video) => {
+			flatArr.push({
+				type: "video",
+				value: video,
+			});
+		});
+
+		const isNumOfVideosOdd = videos.length % 2 !== 0;
+		if (isNumOfVideosOdd) {
+			flatArr.push({
+				type: "separator",
+				value: null,
+			});
+		}
+	});
+
+	return flatArr;
+};
+
+const renderItem: ListRenderItem<FlattenedListItem> = ({ item, index }) => {
+	const { type, value } = item;
+	switch (type) {
+		case "heading":
+			return (
+				<Heading size="xs" className="mt-4 h-10 !text-2xs capitalize">
+					{value.month.slice(0, 3)}, {value.year}
+				</Heading>
+			);
+
+		case "separator":
+			return null;
+
+		case "video":
+			return (
+				<VideoMediaThumbnail
+					video={value}
+					style={{
+						marginRight: index % 2 === 0 ? VIDEO_GAP : 0,
+						marginBottom: VIDEO_GAP,
+					}}
+				/>
+			);
+	}
+};
+
 const VideoCollectionSectionsList_: React.FC<
 	VideoCollectionSectionsListProps
 > = ({ collectionsList, isFetchingMore, hasNextPage, fetchMore }) => {
+	const flattenedList = React.useMemo(
+		() => flattenCollectionsList(collectionsList),
+		[collectionsList],
+	);
+
 	return (
 		<FlatList
-			data={collectionsList}
-			keyExtractor={({ month, year }, index) => month + year + index}
-			onEndReachedThreshold={0.5}
+			data={flattenedList}
+			renderItem={renderItem}
+			numColumns={2}
+			removeClippedSubviews
+			maxToRenderPerBatch={20}
+			updateCellsBatchingPeriod={100}
+			windowSize={200}
+			keyExtractor={({ type, value }, index) => {
+				switch (type) {
+					case "heading":
+						return value.month + value.year;
+
+					case "separator":
+						return "seperator" + index;
+
+					case "video":
+						return value.id;
+				}
+			}}
+			onEndReachedThreshold={0.2}
 			onEndReached={() => {
 				if (isFetchingMore || !hasNextPage) {
 					return;
@@ -86,9 +143,6 @@ const VideoCollectionSectionsList_: React.FC<
 				void fetchMore();
 			}}
 			showsVerticalScrollIndicator={false}
-			renderItem={({ item }) => (
-				<VideoCollectionSection collection={item} />
-			)}
 			ListFooterComponent={
 				<FetchingMoreIndicator isFetchingMore={!!isFetchingMore} />
 			}
