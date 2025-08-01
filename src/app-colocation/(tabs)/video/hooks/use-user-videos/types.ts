@@ -2,6 +2,7 @@
 
 import * as MediaLibrary from "expo-media-library";
 import type { SortingState } from "../../components/video-sorting-modal";
+import type { VideoAsset } from "../../types";
 
 export const MONTH_NAMES = [
 	"january",
@@ -20,13 +21,6 @@ export const MONTH_NAMES = [
 
 export type MonthName = (typeof MONTH_NAMES)[number];
 export type Year = number;
-
-export type VideoAsset = AssertSubtype<
-	MediaLibrary.Asset,
-	MediaLibrary.Asset & {
-		mediaType: "video";
-	}
->;
 
 export interface DatedVideoCollection {
 	month: MonthName;

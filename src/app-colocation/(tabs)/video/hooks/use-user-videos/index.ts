@@ -2,15 +2,15 @@
 
 import * as MediaLibrary from "expo-media-library";
 import React from "react";
+import type { SortingState } from "../../components/video-sorting-modal";
+import { normalizeError } from "../../utils";
 import { userVideosStateReducer } from "./state-reducer";
 import { type UserVideosState } from "./types";
 import {
 	canFetchMore,
 	createCollectionsFromAssets,
 	getVideoAssets,
-	normalizeError,
 } from "./utils";
-import type { SortingState } from "../../components/video-sorting-modal";
 
 export type UseUserVideosReturn = UserVideosState & {
 	permissionResponse: MediaLibrary.PermissionResponse | null;

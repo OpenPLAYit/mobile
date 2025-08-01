@@ -1,6 +1,8 @@
 /** @format */
 
+import * as MediaLibrary from "expo-media-library";
 import type { SortingState } from "../../components/video-sorting-modal";
+import { type VideoAsset } from "../../types";
 import {
 	MONTH_NAMES,
 	type DatedVideoCollection,
@@ -8,10 +10,8 @@ import {
 	type LoadedIdleHasNextPageState,
 	type MonthName,
 	type UserVideosState,
-	type VideoAsset,
 	type Year,
 } from "./types";
-import * as MediaLibrary from "expo-media-library";
 
 type GroupKey = `${MonthName}-${Year}`;
 
@@ -101,13 +101,6 @@ export const wasFetchingMore = (
 	!!s.videoCollections &&
 	!s.error;
 
-export const normalizeError = (err: unknown): Error =>
-	err instanceof Error
-		? err
-		: new Error(
-				typeof err === "string" ? err : "An unknown error occurred.",
-			);
-
 interface GetVideoAssetsOptions {
 	sortedBy: SortingState;
 	afterCursor: string | null;
@@ -137,7 +130,7 @@ export const getVideoAssets = async ({
 
 	const assetsOptions = {
 		after: afterCursor ?? undefined,
-		first: 100,
+		first: 50,
 		mediaType: MediaLibrary.MediaType.video,
 		sortBy: [sorting], // must be nested in an array to work
 	} satisfies MediaLibrary.AssetsOptions;
