@@ -8,6 +8,7 @@ import {
 	type LoadedIdleHasNextPageState,
 	type MonthName,
 	type UserVideosState,
+	type VideoAsset,
 	type Year,
 } from "./types";
 import * as MediaLibrary from "expo-media-library";
@@ -19,7 +20,7 @@ const addAssetToCollectionMap = ({
 	asset,
 }: {
 	collectionMap: Map<GroupKey, DatedVideoCollection>;
-	asset: MediaLibrary.Asset;
+	asset: VideoAsset;
 }) => {
 	const modificationDate = new Date(asset.modificationTime);
 	const year = modificationDate.getFullYear();
@@ -46,7 +47,7 @@ const addAssetToCollectionMap = ({
 };
 
 export const createCollectionsFromAssets = (
-	assets: MediaLibrary.Asset[],
+	assets: VideoAsset[],
 ): DatedVideoCollection[] => {
 	const groupedCollectionsMap = new Map<GroupKey, DatedVideoCollection>();
 
@@ -65,7 +66,7 @@ export const addAssetsToExistingCollections = ({
 	newAssets,
 }: {
 	existingCollections: DatedVideoCollection[];
-	newAssets: MediaLibrary.Asset[];
+	newAssets: VideoAsset[];
 }): DatedVideoCollection[] => {
 	const collectionMap = new Map<GroupKey, DatedVideoCollection>();
 	existingCollections.forEach((collection) => {
@@ -107,15 +108,39 @@ export const normalizeError = (err: unknown): Error =>
 				typeof err === "string" ? err : "An unknown error occurred.",
 			);
 
+type EXSupportedSortKey = AssertSubtype<
+	SortingState["key"],
+	"date" | "duration"
+>;
+
+type EXSupportedSortingState = AssertSubtype<
+	SortingState,
+	{
+		key: EXSupportedSortKey;
+		selected: SortingState["selected"];
+	}
+>;
+
+const EXSUPPORTED_SORTING_KEYS = [
+	"date",
+	"duration",
+] satisfies EXSupportedSortKey[];
+
+export const isEXSupportedSorting = (
+	sorting: SortingState,
+): sorting is EXSupportedSortingState =>
+	EXSUPPORTED_SORTING_KEYS.some((key) => key === sorting.key);
+
 interface GetVideoAssetsOptions {
-	sortedBy: SortingState;
+	/**Only date and duration sorting is supported internally. */
+	sortedBy: EXSupportedSortingState;
 	afterCursor: string | null;
 }
-export const getVideoAssets = ({
+export const getVideoAssets = async ({
 	sortedBy,
 	afterCursor,
 }: GetVideoAssetsOptions) => {
-	// TODO: Add support for name and size
+	// NOTE: Support for name and size sorting is handled externally.
 	let sorting: [
 		SafeExtract<MediaLibrary.SortByValue, "modificationTime" | "duration">,
 		boolean,
@@ -136,10 +161,12 @@ export const getVideoAssets = ({
 
 	const assetsOptions = {
 		after: afterCursor ?? undefined,
-		first: 50,
+		first: 200,
 		mediaType: MediaLibrary.MediaType.video,
 		sortBy: [sorting], // must be nested in an array to work
 	} satisfies MediaLibrary.AssetsOptions;
 
-	return MediaLibrary.getAssetsAsync(assetsOptions);
+	const assetsResult = await MediaLibrary.getAssetsAsync(assetsOptions);
+
+	return assetsResult as MediaLibrary.PagedInfo<VideoAsset>;
 };
