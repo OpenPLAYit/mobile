@@ -15,51 +15,16 @@ import {
 
 import { IconButton } from "@/app-colocation/(tabs)/video/components/icon-button";
 import { VideoCollectionSectionsList } from "@/app-colocation/(tabs)/video/components/video-collection-sections-list";
-import { VideoMediaPlayer } from "@/app-colocation/(tabs)/video/components/video-media-player";
 import {
 	VideoSortingModal,
 	type VideoSortingModalProps,
 } from "@/app-colocation/(tabs)/video/components/video-sorting-modal";
-import {
-	VIDEO_GAP,
-	WINDOW_SCREEN_PADDING,
-} from "@/app-colocation/(tabs)/video/constants";
+import { WINDOW_SCREEN_PADDING } from "@/app-colocation/(tabs)/video/constants";
 import { useUserVideos } from "@/app-colocation/(tabs)/video/hooks/use-user-videos";
 import { PlayerProvider } from "@/app-colocation/(tabs)/video/player-context";
 import { Text } from "@/components/ui/text";
-import { isObject } from "@/lib/utils";
-import { type VideoSource } from "expo-video";
 import React from "react";
-import { ActivityIndicator, ScrollView } from "react-native";
-
-interface RecentlyWatchedVideosProps {
-	videos: VideoSource[];
-}
-const RecentlyWatchedVideos: React.FC<RecentlyWatchedVideosProps> = ({
-	videos,
-}) => {
-	return (
-		<ScrollView
-			horizontal
-			showsHorizontalScrollIndicator={false}
-			className="flex-row">
-			{videos.map((video, index) => (
-				<VideoMediaPlayer
-					key={
-						(isObject(video)
-							? (video.uri ?? video.assetId)
-							: video) ?? index
-					}
-					source={video}
-					style={{
-						marginRight:
-							index === videos.length - 1 ? 0 : VIDEO_GAP,
-					}}
-				/>
-			))}
-		</ScrollView>
-	);
-};
+import { ActivityIndicator } from "react-native";
 
 // Extracted comp to avoid rerendering parent when modal opens or closes.
 const SortingModal: React.FC<
@@ -132,7 +97,6 @@ export default function VideoTab() {
 							</Box>
 
 							{/* TODO: Add recently RecentlyWatchedVideos */}
-							<RecentlyWatchedVideos videos={[]} />
 						</Box>
 
 						<Box className="flex-1 gap-2">

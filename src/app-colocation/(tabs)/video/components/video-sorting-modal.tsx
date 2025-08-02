@@ -80,9 +80,9 @@ const SortingRadio: React.FC<SortingRadioProps> = ({
 				className={cn("capitalize", variant === "key" && "text-xl")}>
 				{label}
 			</RadioLabel>
-			<RadioIndicator className="data-[checked=true]:border-success-500">
+			<RadioIndicator className="data-[checked=true]:border-primary-500">
 				<RadioIcon
-					className="fill-success-500 stroke-success-500"
+					className="fill-primary-500 stroke-primary-500"
 					as={CircleIcon}
 				/>
 			</RadioIndicator>
@@ -146,7 +146,7 @@ export const VideoSortingModal: React.FC<VideoSortingModalProps> = ({
 			<ModalBackdrop />
 			<ModalContent className="gap-6">
 				<ModalHeader>
-					<Heading size="3xl" className="text-success-500">
+					<Heading size="3xl" className="text-primary-500">
 						Sort by
 					</Heading>
 				</ModalHeader>
@@ -198,7 +198,7 @@ export const VideoSortingModal: React.FC<VideoSortingModalProps> = ({
 							onOpenChange(false);
 							onSortingChange(optimisticSortingState);
 						}}>
-						<Text className="font-semibold text-success-500">
+						<Text className="font-semibold text-primary-500">
 							OK
 						</Text>
 					</ModalCloseButton>
