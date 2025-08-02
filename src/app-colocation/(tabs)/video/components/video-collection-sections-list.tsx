@@ -10,7 +10,7 @@ import React from "react";
 import { ActivityIndicator, FlatList, type ListRenderItem } from "react-native";
 import type { DatedVideoCollection } from "../hooks/use-user-videos/types";
 import type { VideoAsset } from "../types";
-import { VideoMediaThumbnail } from "./video-thumbnail";
+import { VideoListItem } from "./video-list-item";
 
 interface VideoCollectionSectionsListProps
 	extends Pick<
@@ -95,7 +95,7 @@ const renderItem: ListRenderItem<FlattenedListItem> = ({ item, index }) => {
 
 		case "video":
 			return (
-				<VideoMediaThumbnail
+				<VideoListItem
 					video={value}
 					style={{
 						marginRight: index % 2 === 0 ? VIDEO_GAP : 0,

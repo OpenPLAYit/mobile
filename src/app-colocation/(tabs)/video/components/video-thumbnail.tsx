@@ -59,7 +59,7 @@ const DurationBanner: React.FC<{
 	);
 };
 
-const useThumbnailDimensions = () => {
+export const useThumbnailDimensions = () => {
 	const { width } = useWindowDimensions();
 
 	const totalHorizontalSpace = WINDOW_SCREEN_PADDING * 2 + VIDEO_GAP;
