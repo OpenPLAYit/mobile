@@ -1,14 +1,21 @@
 /** @format */
 
+import {
+	useVideoPlayback,
+	VideoPlaybackProvider,
+} from "@/app-colocation/(tabs)/contexts/video-playback";
+import { Box } from "@/components/ui/box";
 import { Icon } from "@/components/ui/icon";
-import { PortalHost } from "@/components/ui/portal";
-import { FULLSCREEN_VIDEO_THUMBNAIL_PORTAL_HOST } from "@/constants";
 import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
 import { Stack, Tabs } from "expo-router";
 import { Music, User, Video, type LucideIcon } from "lucide-react-native";
 import { cssInterop } from "nativewind";
 import React from "react";
 import type { ViewStyle } from "react-native";
+import {
+	useSafeAreaInsets,
+	type EdgeInsets,
+} from "react-native-safe-area-context";
 
 const tabsMap = [
 	{ name: "index", title: "Video", icon: Video },
@@ -77,10 +84,41 @@ const CustomTabs = cssInterop(
 	},
 );
 
-export default function TabLayout() {
+/**
+ * Preserves the previous bottom inset when a video is in fullscreen playback.
+ * This prevents UI layout shifts that occur when the navigation bar's
+ * visibility changes.
+ */
+const useVideoAwareSafeAreaInsets = (): EdgeInsets => {
+	const insets = useSafeAreaInsets();
+	const prevInsetsRef = React.useRef(insets);
+	const { isVideoInPlaybackRef } = useVideoPlayback();
+	React.useEffect(() => {
+		if (isVideoInPlaybackRef.current) return;
+		prevInsetsRef.current = insets;
+	}, [insets, isVideoInPlaybackRef]);
+
+	if (isVideoInPlaybackRef.current) {
+		return {
+			...insets,
+			bottom: prevInsetsRef.current.bottom,
+		};
+	}
+
+	return insets;
+};
+
+const VideoAwareSafeArea = () => {
+	const insets = useVideoAwareSafeAreaInsets();
 	return (
-		<>
-			<Stack.Screen options={{ headerShown: false }} />
+		<Box
+			style={{
+				paddingTop: insets.top,
+				paddingLeft: insets.left,
+				paddingBottom: insets.bottom,
+				paddingRight: insets.right,
+			}}
+			className="flex-1">
 			<CustomTabs
 				tabBarActiveTintColor="text-primary-500"
 				tabBarInactiveTintColor="text-secondary-800"
@@ -99,8 +137,15 @@ export default function TabLayout() {
 					/>
 				))}
 			</CustomTabs>
+		</Box>
+	);
+};
 
-			<PortalHost name={FULLSCREEN_VIDEO_THUMBNAIL_PORTAL_HOST} />
-		</>
+export default function TabLayout() {
+	return (
+		<VideoPlaybackProvider>
+			<Stack.Screen options={{ headerShown: false }} />
+			<VideoAwareSafeArea />
+		</VideoPlaybackProvider>
 	);
 }

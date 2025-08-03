@@ -16,9 +16,7 @@ import {
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Box } from "@/components/ui/box";
 import { PortalHost } from "@/components/ui/portal";
 import { useSystemColorScheme } from "@/hooks/use-color-scheme";
 import "../../global.css";
@@ -64,11 +62,7 @@ function RootLayoutNav() {
 		<GluestackUIProvider mode={colorScheme}>
 			<ThemeProvider
 				value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-				<Box className="flex-1 bg-background-0">
-					<SafeAreaView className="flex-1">
-						<Stack initialRouteName="(tabs)" />
-					</SafeAreaView>
-				</Box>
+				<Stack initialRouteName="(tabs)" />
 				<PortalHost />
 			</ThemeProvider>
 		</GluestackUIProvider>

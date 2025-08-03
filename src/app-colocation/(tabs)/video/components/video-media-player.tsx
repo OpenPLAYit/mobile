@@ -1,211 +1,105 @@
 /** @format */
 
 import { Box } from "@/components/ui/box";
-import { Image } from "@/components/ui/image";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Portal } from "@/components/ui/portal";
-import { FULLSCREEN_VIDEO_THUMBNAIL_PORTAL_HOST } from "@/constants";
-import { cn } from "@/lib/utils";
-import { VideoView, type VideoSource, type VideoViewProps } from "expo-video";
-import * as VideoThumbnails from "expo-video-thumbnails";
+import { usePreventRemove } from "@react-navigation/native";
+import * as NavigationBar from "expo-navigation-bar";
+import { StatusBar } from "expo-status-bar";
+import { VideoView } from "expo-video";
 import React from "react";
-import {
-	Pressable,
-	useWindowDimensions,
-	View,
-	type NativeMethods,
-} from "react-native";
+import { BackHandler } from "react-native";
 import { cssInterop } from "react-native-css-interop";
-import Animated from "react-native-reanimated";
-import { VIDEO_GAP, WINDOW_SCREEN_PADDING } from "../constants";
-import {
-	useThumbnailToFullscreenTransition,
-	type ElementLayout,
-} from "../hooks/use-thumbnail-to-fullscreen-transition";
-import { usePlayer } from "../player-context";
-import { VideoMediaThumbnail } from "./video-media-thumbnail";
+import { useVideoPlayback } from "../../contexts/video-playback";
+import type { VideoAsset } from "../types";
 
 cssInterop(VideoView, {
 	className: "style",
 });
-cssInterop(Animated.View, {
-	className: "style",
-});
 
-export const PLAYER_ASPECT_RATIO = 16 / 9;
-
-export const usePlayerDimensions = () => {
-	const { width } = useWindowDimensions();
-
-	const totalHorizontalSpace = WINDOW_SCREEN_PADDING * 2 + VIDEO_GAP;
-	const playerWidth = (width - totalHorizontalSpace) / 2;
-	const playerHeight = playerWidth / PLAYER_ASPECT_RATIO;
-
-	return {
-		width: playerWidth,
-		height: playerHeight,
-		aspectRatio: PLAYER_ASPECT_RATIO,
-	} satisfies {
-		width: number;
-		height: number;
-		aspectRatio: number;
-	};
-};
-
-/**Returns a promise that resolves with the measured layout. */
-const measureLayout = (view: Pick<NativeMethods, "measureInWindow">) => {
-	return new Promise<ElementLayout>((resolve) => {
-		view.measureInWindow((pageX, pageY, width, height) => {
-			resolve({
-				pageX,
-				pageY,
-				width,
-				height,
-			});
-		});
+const useStopPlaybackOnExit = ({
+	isInPlayback,
+	onExitPlayback,
+}: {
+	isInPlayback: boolean;
+	onExitPlayback: () => void;
+}) => {
+	usePreventRemove(isInPlayback, () => {
+		if (isInPlayback) {
+			onExitPlayback();
+		}
 	});
+	React.useEffect(() => {
+		const subscription = BackHandler.addEventListener(
+			"hardwareBackPress",
+			() => {
+				if (isInPlayback) {
+					onExitPlayback();
+					return true;
+				}
+				return false;
+			},
+		);
+
+		return () => subscription.remove();
+	}, [isInPlayback, onExitPlayback]);
 };
 
-export interface VideoMediaPlayerProps
-	extends Pick<VideoViewProps, "className" | "style"> {
-	source: VideoSource;
+interface VideoMediaPlayerProps {
+	isInPlayback: boolean;
+	setIsInPlayback: (isInPlayback: boolean) => void;
+	video: VideoAsset;
 }
 
 const VideoMediaPlayer_: React.FC<VideoMediaPlayerProps> = ({
-	source,
-	className,
-	style,
+	isInPlayback,
+	setIsInPlayback,
+	video,
 }) => {
-	const [thumbnail, setThumbnail] =
-		React.useState<VideoThumbnails.VideoThumbnailsResult | null>(null);
-
-	const [isPlaybackInitiated, setIsPlaybackInitiated] = React.useState(false);
-	const { player } = usePlayer();
-
-	const { width } = usePlayerDimensions();
-
-	const {
-		animatedStyle,
-		animatedBackgroundStyle,
-		startTransition,
-		resetTransition,
-	} = useThumbnailToFullscreenTransition();
-
-	const thumbnailLayoutRef = React.useRef<ElementLayout>({
-		pageX: 0,
-		pageY: 0,
-		width: 0,
-		height: 0,
-	});
-	const thumbnailElementRef = React.useRef<View>(null);
+	const { player, isVideoInPlaybackRef } = useVideoPlayback();
 
 	const videoViewRef = React.useRef<VideoView>(null);
-	const onInitiatePlayback = async () => {
-		if (!thumbnail || !thumbnailElementRef.current) {
-			throw new Error("video thumbnail not ready!");
-		}
-		if (!videoViewRef.current) {
-			throw new Error("Video view not ready!");
-		}
 
-		// first measure the thumbnail layout to know exact starting points
-		// for the fullscreen transition.
-		thumbnailLayoutRef.current = await measureLayout(
-			thumbnailElementRef.current,
-		);
-
-		// then the state update will use the fresh layout values.
-		setIsPlaybackInitiated(true);
-
-		const replaceAsyncPromise = player.replaceAsync(source);
-
-		const startTransitionPromise = startTransition({
-			videoIntrisincAspectRatio: thumbnail.width / thumbnail.height,
-			initialThumbnailLayout: thumbnailLayoutRef.current,
-		});
-
-		// `all` is better than `allSettled` here, because with `all`, if any
-		// of the promises rejects, the `all` rejects immediately.
-		await Promise.all([replaceAsyncPromise, startTransitionPromise]);
-
-		await videoViewRef.current.enterFullscreen();
+	const onEnterPlayback = React.useCallback(async () => {
+		isVideoInPlaybackRef.current = true;
+		await player.replaceAsync(video);
+		void NavigationBar.setVisibilityAsync("hidden");
 		player.play();
-	};
+	}, [isVideoInPlaybackRef, player, video]);
 
-	const onExitPlayback = () => {
+	const onExitPlayback = React.useCallback(() => {
 		player.pause();
-		resetTransition({
-			initialThumbnailLayout: thumbnailLayoutRef.current,
-		})
-			.then(() => setIsPlaybackInitiated(false))
-			.catch(console.error);
-	};
+		isVideoInPlaybackRef.current = false;
+		setIsInPlayback(false);
+		void NavigationBar.setVisibilityAsync("visible");
+	}, [isVideoInPlaybackRef, player, setIsInPlayback]);
+
+	React.useEffect(() => {
+		if (isInPlayback) {
+			onEnterPlayback().catch(console.error);
+		} else {
+			onExitPlayback();
+		}
+	}, [isInPlayback, onExitPlayback, onEnterPlayback]);
+
+	useStopPlaybackOnExit({ isInPlayback, onExitPlayback });
 
 	return (
-		<View
-			style={[
-				{
-					width,
-					aspectRatio: PLAYER_ASPECT_RATIO,
-				},
-				style,
-			]}
-			className={cn("items-center justify-center", className)}>
-			<VideoView
-				ref={videoViewRef}
-				player={player}
-				onFullscreenExit={onExitPlayback}
-				className="sr-only" // we only need this View to enter video fullscreen
-			/>
-
-			{/* thumbnail that initiates playback on press */}
-			<Pressable
-				onPress={() => {
-					onInitiatePlayback().catch(console.error);
-				}}
-				className="size-full">
-				<VideoMediaThumbnail
-					videoSource={source}
-					ref={thumbnailElementRef}
-					setThumbnailResult={setThumbnail}
-					className={"size-full"}
-				/>
-			</Pressable>
-
-			{isPlaybackInitiated && thumbnail && (
-				<Portal
-					name="video-thumbnail-portal"
-					hostName={FULLSCREEN_VIDEO_THUMBNAIL_PORTAL_HOST}>
-					{/* Animated.View for the full-screen background overlay */}
-					<Animated.View
-						className={"size-full"}
-						style={[
-							animatedBackgroundStyle,
-							{ zIndex: 9998 }, // Behind the thumbnail, but above other content
-						]}></Animated.View>
-
-					<Box
-						style={{
-							position: "absolute",
-							top: thumbnailLayoutRef.current.pageY,
-							left: thumbnailLayoutRef.current.pageX,
-							width: thumbnailLayoutRef.current.width,
-							height: thumbnailLayoutRef.current.height,
-							zIndex: 9999, // Ensure it's on top
-						}}>
-						<Animated.View
-							className={"size-full"}
-							style={animatedStyle}>
-							<Image
-								source={{ uri: thumbnail.uri }}
-								alt="animated video thumbnail"
-								contentFit="cover"
-								size="full"
-							/>
-						</Animated.View>
-					</Box>
-				</Portal>
-			)}
-		</View>
+		isInPlayback && (
+			<Portal name="video-portal">
+				<StatusBar hidden />
+				<Box className="absolute left-0 top-0 size-full bg-red-500 pt-24">
+					<Button onPress={onExitPlayback}>
+						<ButtonText>Back</ButtonText>
+					</Button>
+					<VideoView
+						ref={videoViewRef}
+						player={player}
+						className="flex-1"
+					/>
+				</Box>
+			</Portal>
+		)
 	);
 };
 
