@@ -94,8 +94,8 @@ const buttonIconStyle = tva({
 			destructive: "text-typography-50",
 			secondary: "text-typography-50",
 			outline:
-				"text-typography-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-600",
-			ghost: "text-typography-500 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-600",
+				"text-typography-600 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-600",
+			ghost: "text-typography-600 data-[hover=true]:text-primary-500 data-[active=true]:text-primary-600",
 			link: "text-primary-500 data-[hover=true]:text-primary-600 data-[active=true]:text-primary-700",
 		},
 		size: {
