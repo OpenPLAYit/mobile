@@ -9,7 +9,7 @@ interface PropSlotProps extends Record<string, unknown> {
 }
 
 const checkHasClassNameProp = (
-	value: unknown
+	value: unknown,
 ): value is { className?: string } => isObject(value) && "className" in value;
 
 /**
@@ -21,7 +21,7 @@ const PropSlot: React.FC<PropSlotProps> = ({ children, ...slotProps }) => {
 
 	if (!React.isValidElement(singleChild)) {
 		throw new Error(
-			"[Slot]: props.children must be a valid React Element."
+			"[Slot]: props.children must be a valid React Element.",
 		);
 	}
 
@@ -72,5 +72,9 @@ type AsChildProps<TProps> = Prettify<
 	  })
 >;
 
+/**Extracts the original component props (TProps) from a type that has had
+ * the {@link AsChildProps} pattern applied to it. */
+type NoAsChildProps<T> = T extends AsChildProps<infer P> ? P : never;
+
 export { PropSlot };
-export type { AsChildProps, PropSlotProps };
+export type { AsChildProps, NoAsChildProps, PropSlotProps };
