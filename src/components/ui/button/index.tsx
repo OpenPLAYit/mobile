@@ -141,6 +141,7 @@ const Button: React.FC<ButtonProps> = ({
 	className,
 	variant = "default",
 	size = "default",
+	hitSlop,
 	...props
 }) => {
 	return (
@@ -148,6 +149,7 @@ const Button: React.FC<ButtonProps> = ({
 			{...props}
 			className={buttonStyle({ variant, size, class: className })}
 			context={{ variant, size }}
+			hitSlop={hitSlop ?? (size === "icon" ? 16 : undefined)}
 		/>
 	);
 };
