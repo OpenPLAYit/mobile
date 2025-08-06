@@ -38,29 +38,39 @@ const removePortal = (hostName: string, name: string) => {
 	});
 };
 
-/**
- * @see {@link https://rn-primitives.vercel.app/portal/}
- */
-export function PortalHost({ name = DEFAULT_PORTAL_HOST }: { name?: string }) {
-	const portalMap =
-		usePortal((state) => state.map).get(name) ??
-		new Map<string, React.ReactNode>();
-	if (portalMap.size === 0) return null;
-	return <>{Array.from(portalMap.values())}</>;
+interface PortalHostProps {
+	name?: string;
 }
 
 /**
  * @see {@link https://rn-primitives.vercel.app/portal/}
  */
-export function Portal({
-	name,
-	hostName = DEFAULT_PORTAL_HOST,
-	children,
-}: {
+const PortalHost: React.FC<PortalHostProps> = ({
+	name = "DEFAULT_PORTAL_HOST",
+}) => {
+	const portalMap =
+		usePortal((state) => state.map).get(name) ??
+		new Map<string, React.ReactNode>();
+
+	if (portalMap.size === 0) return null;
+
+	return <>{Array.from(portalMap.values())}</>;
+};
+
+interface PortalProps {
 	name: string;
 	hostName?: string;
 	children: React.ReactNode;
-}) {
+}
+
+/**
+ * @see {@link https://rn-primitives.vercel.app/portal/}
+ */
+const Portal: React.FC<PortalProps> = ({
+	name,
+	hostName = DEFAULT_PORTAL_HOST,
+	children,
+}) => {
 	React.useEffect(() => {
 		updatePortal(hostName, name, children);
 	}, [hostName, name, children]);
@@ -72,4 +82,7 @@ export function Portal({
 	}, [hostName, name]);
 
 	return null;
-}
+};
+
+export { Portal, PortalHost };
+export type { PortalProps, PortalHostProps };
