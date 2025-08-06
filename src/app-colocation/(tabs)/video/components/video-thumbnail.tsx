@@ -1,45 +1,21 @@
 /** @format */
 
-import React from "react";
-import type { VideoAsset } from "../types";
+import { Box, type BoxProps } from "@/components/ui/box";
+import { Icon } from "@/components/ui/icon";
+import { Image } from "@/components/ui/image";
+import { Text } from "@/components/ui/text";
+import { cn, formatDuration } from "@/lib/utils";
 import * as EXVideoThumbnails from "expo-video-thumbnails";
-import { normalizeError } from "../utils";
+import { Play } from "lucide-react-native";
+import React from "react";
 import { useWindowDimensions } from "react-native";
 import {
 	THUMBNAIL_ASPECT_RATIO,
 	VIDEO_GAP,
 	WINDOW_SCREEN_PADDING,
 } from "../constants";
-import { Box, type BoxProps } from "@/components/ui/box";
-import { cn } from "@/lib/utils";
-import { Image } from "@/components/ui/image";
-import { Icon } from "@/components/ui/icon";
-import { Play } from "lucide-react-native";
-import { Text } from "@/components/ui/text";
-
-const formatDuration = (totalSeconds: number): string => {
-	const pad = (num: number) => num.toString().padStart(2, "0");
-
-	const secondsInDay = 86400; // 24 * 60 * 60
-
-	const days = Math.floor(totalSeconds / secondsInDay);
-	const hours = Math.floor((totalSeconds % secondsInDay) / 3600);
-	const minutes = Math.floor((totalSeconds % 3600) / 60);
-	const seconds = Math.floor(totalSeconds % 60);
-
-	let formattedString = "";
-
-	if (days > 0) {
-		formattedString += `${pad(days)}:`;
-		formattedString += `${pad(hours)}:`;
-	} else if (hours > 0) {
-		formattedString += `${pad(hours)}:`;
-	}
-
-	formattedString += `${pad(minutes)}:${pad(seconds)}`;
-
-	return formattedString;
-};
+import type { VideoAsset } from "../types";
+import { normalizeError } from "../utils";
 
 const DurationBanner: React.FC<{
 	duration: number;
@@ -147,7 +123,7 @@ const VideoMediaThumbnail_: React.FC<VideoMediaThumbnailProps> = ({
 					{thumbnailState.error.message}
 				</Text>
 			) : (
-				<Icon as={Play} className="text-success-500" />
+				<Icon as={Play} className="text-primary-500" />
 			)}
 
 			<DurationBanner
