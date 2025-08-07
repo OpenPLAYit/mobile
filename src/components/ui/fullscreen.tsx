@@ -8,7 +8,7 @@ import React from "react";
 import { BackHandler } from "react-native";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 import { Box, type BoxProps } from "./box";
-import { Portal } from "./portal";
+import { Portal, type PortalProps } from "./portal";
 import type { NoAsChildProps } from "./slot";
 
 const useLeaveFullscreenOnExit = ({
@@ -41,18 +41,30 @@ const useLeaveFullscreenOnExit = ({
 
 const AnimatedBox = Animated.createAnimatedComponent(Box);
 
-type FullscreenProps = Prettify<
-	NoAsChildProps<BoxProps> & {
-		isInFullscreen: boolean;
-		onFullscreenChange: (isInFullscreen: boolean) => void;
-	}
->;
+interface FullscreenContextType {
+	isInFullscreen: boolean;
+	onFullscreenChange: (isInFullscreen: boolean) => void;
+}
+const FullscreenContext = React.createContext<FullscreenContextType | null>(
+	null,
+);
 
-const Fullscreen_: React.FC<FullscreenProps> = ({
+const useFullscreen = () => {
+	const context = React.use(FullscreenContext);
+	if (!context) {
+		throw new Error(
+			"useFullscreen must be used within a FullscreenContext provider.",
+		);
+	}
+	return context;
+};
+
+type FullscreenPortalProps = PortalProps & FullscreenContextType;
+
+const FullscreenPortal_: React.FC<FullscreenPortalProps> = ({
 	children,
 	isInFullscreen,
 	onFullscreenChange,
-	className,
 	...props
 }) => {
 	React.useEffect(() => {
@@ -66,28 +78,47 @@ const Fullscreen_: React.FC<FullscreenProps> = ({
 		onLeaveFullscreen: () => onFullscreenChange(false),
 	});
 
+	const contextValue: FullscreenContextType = React.useMemo(
+		() => ({ isInFullscreen, onFullscreenChange }),
+		[isInFullscreen, onFullscreenChange],
+	);
+
 	return (
-		<>
-			{isInFullscreen && (
-				<Portal name="fullscreen-portal">
-					<AnimatedBox
-						{...props}
-						className={cn(
-							"absolute left-0 top-0 size-full",
-							className,
-						)}
-						entering={SlideInRight}
-						exiting={SlideOutRight}>
-						{children}
-					</AnimatedBox>
-				</Portal>
-			)}
-			{isInFullscreen && <StatusBar hidden />}
-		</>
+		isInFullscreen && (
+			<Portal {...props}>
+				<FullscreenContext value={contextValue}>
+					{children}
+				</FullscreenContext>
+				<StatusBar hidden />
+			</Portal>
+		)
 	);
 };
+const FullscreenPortal = React.memo(
+	FullscreenPortal_,
+) as typeof FullscreenPortal_;
 
-const Fullscreen = React.memo(Fullscreen_) as typeof Fullscreen_;
+type FullscreenContentProps = NoAsChildProps<BoxProps>;
 
-export { Fullscreen };
-export type { FullscreenProps };
+const FullscreenContent_: React.FC<FullscreenContentProps> = ({
+	className,
+	...props
+}) => {
+	const { isInFullscreen } = useFullscreen();
+	return (
+		isInFullscreen && (
+			<AnimatedBox
+				{...props}
+				className={cn("absolute left-0 top-0 size-full", className)}
+				entering={SlideInRight}
+				exiting={SlideOutRight}
+			/>
+		)
+	);
+};
+const FullscreenContent = React.memo(
+	FullscreenContent_,
+) as typeof FullscreenContent_;
+
+export { FullscreenPortal, FullscreenContent };
+export type { FullscreenPortalProps, FullscreenContentProps };
