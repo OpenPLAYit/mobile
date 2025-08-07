@@ -12,7 +12,7 @@ export const isObject = (object: unknown): object is PlainObject =>
 	!!object && typeof object === "object" && !Array.isArray(object);
 
 export const formatDuration = (totalSeconds: number): string => {
-	const pad = (num: number) => num.toString().padStart(2, "0");
+	const pad = (num: number) => Math.max(0, num).toString().padStart(2, "0");
 
 	const secondsInDay = 86400; // 24 * 60 * 60
 
