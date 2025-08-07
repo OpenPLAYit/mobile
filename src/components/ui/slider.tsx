@@ -186,6 +186,7 @@ type SliderThumbProps = Prettify<
 const SliderThumb: React.FC<SliderThumbProps> = ({
 	className,
 	size,
+	hitSlop = 16,
 	...props
 }) => {
 	const { size: parentSize } = useStyleContext(SCOPE) as VariantProps<
@@ -202,6 +203,7 @@ const SliderThumb: React.FC<SliderThumbProps> = ({
 				size,
 				class: className,
 			})}
+			hitSlop={hitSlop}
 		/>
 	);
 };
@@ -211,7 +213,11 @@ type SliderTrackProps = Prettify<
 		VariantProps<typeof sliderTrackStyle>
 >;
 
-const SliderTrack: React.FC<SliderTrackProps> = ({ className, ...props }) => {
+const SliderTrack: React.FC<SliderTrackProps> = ({
+	className,
+	hitSlop = 16,
+	...props
+}) => {
 	const {
 		orientation: parentOrientation,
 		size: parentSize,
@@ -229,6 +235,7 @@ const SliderTrack: React.FC<SliderTrackProps> = ({ className, ...props }) => {
 				},
 				class: className,
 			})}
+			hitSlop={hitSlop}
 		/>
 	);
 };
@@ -240,6 +247,7 @@ type SliderFilledTrackProps = Prettify<
 
 const SliderFilledTrack: React.FC<SliderFilledTrackProps> = ({
 	className,
+	hitSlop = 16,
 	...props
 }) => {
 	const { orientation: parentOrientation } = useStyleContext(
@@ -255,6 +263,7 @@ const SliderFilledTrack: React.FC<SliderFilledTrackProps> = ({
 				},
 				class: className,
 			})}
+			hitSlop={hitSlop}
 		/>
 	);
 };
