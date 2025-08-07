@@ -6,6 +6,8 @@ import {
 } from "@/app-colocation/(tabs)/contexts/video-playback";
 import { Box } from "@/components/ui/box";
 import { Icon } from "@/components/ui/icon";
+import { PortalHost } from "@/components/ui/portal";
+import { VIDEO_FULLSCREEN_PORTAL_HOST } from "@/constants";
 import type { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
 import { Stack, Tabs } from "expo-router";
 import { Music, User, Video, type LucideIcon } from "lucide-react-native";
@@ -146,6 +148,8 @@ export default function TabLayout() {
 		<VideoPlaybackProvider>
 			<Stack.Screen options={{ headerShown: false }} />
 			<VideoAwareSafeArea />
+
+			<PortalHost name={VIDEO_FULLSCREEN_PORTAL_HOST} />
 		</VideoPlaybackProvider>
 	);
 }
