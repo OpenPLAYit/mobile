@@ -12,7 +12,7 @@ import { MoreVertical } from "lucide-react-native";
 import React from "react";
 import { Pressable } from "react-native";
 import type { VideoAsset } from "../types";
-import { VideoMediaPlayer } from "./video-media-player";
+import { VideoMediaPlayer } from "./video-player";
 import { useThumbnailDimensions, VideoMediaThumbnail } from "./video-thumbnail";
 
 interface VideoListItemProps extends Pick<BoxProps, "style" | "className"> {
